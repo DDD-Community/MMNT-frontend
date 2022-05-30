@@ -3,15 +3,19 @@ import 'dart:ui' as ui;
 import 'package:dash_mement/constants/file_constants.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/utils/permission_utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../constants/style_constants.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -19,6 +23,10 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  final double _initFabHeight = 60.h;
+  double _fabHeight = 0;
+  double _panelHeightOpen = 284.h;
+  double _panelHeightClosed = 50.h;
   late Position currentPosition;
   late GoogleMapController _mapController;
   late String _mapStyle;
@@ -50,6 +58,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
+    _fabHeight = _initFabHeight;
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       rootBundle.loadString(FileConstants.mapStyle).then((string) {
         _mapStyle = string;
@@ -58,18 +67,6 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  // Future<void> _getUserLocation(BuildContext context) async {
-  //   PermissionUtils?.requestPermission(Permission.location, context,
-  //       isOpenSettings: true, permissionGrant: () async {
-  //         await LocationService().fetchCurrentLocation(context, _getPharmacyList,
-  //             updatePosition: updateCameraPosition);
-  //       }, permissionDenied: () {
-  //         Fluttertoast.showToast(
-  //             backgroundColor: Colors.blue,
-  //             msg:
-  //             "Please grant the required permission from settings to access this feature.");
-  //       });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -83,21 +80,27 @@ class _MapScreenState extends State<MapScreen> {
       child: Stack(
         children: [
           SlidingUpPanel(
-
-            minHeight: 50,
-            maxHeight: 280,
-            color: Color(0xFF111111).withOpacity(0.8),
+            maxHeight: _panelHeightOpen,
+            minHeight: _panelHeightClosed,
+            // minHeight: 50,
+            // maxHeight: 284.h,
+            color: const Color(0xFF111111).withOpacity(0.8),
             borderRadius: slidingPanelRadius,
             backdropEnabled: true,
+            onPanelSlide: (double pos) => setState(() {
+              _fabHeight = pos * (_panelHeightOpen - _panelHeightClosed) +
+                  _initFabHeight;
+            }),
             body: SafeArea(
               child: Scaffold(
                   body: Stack(children: [
                     GoogleMap(
                       myLocationEnabled: true,
-                      myLocationButtonEnabled: true,
-                      zoomGesturesEnabled: true,
-                      zoomControlsEnabled: true,
+                      myLocationButtonEnabled: false,
                       mapToolbarEnabled: false,
+                      zoomControlsEnabled: false,
+                      // zoomGesturesEnabled: true,
+                      // zoomControlsEnabled: true,
                       key: _keyGoogleMap,
                       markers: _showMarkers,
                       initialCameraPosition: _kGooglePlex,
@@ -106,11 +109,7 @@ class _MapScreenState extends State<MapScreen> {
                         _mapController.setMapStyle(_mapStyle);
                         getCurrentPosition();
                       },
-                      onCameraIdle: () {
-                        setState(() {
-                          _isCameraReCenter = false;
-                        });
-                      },
+
                     ),
                     Container(
                       height: 80,
@@ -119,10 +118,9 @@ class _MapScreenState extends State<MapScreen> {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                Colors.white,
-                                Colors.white,
-                                Colors.white70,
-                                Colors.white30
+                                Colors.black.withOpacity(0.8),
+                                Colors.black.withOpacity(0.6),
+                                Colors.black.withOpacity(0.1)
                               ]
                           )
                       ),
@@ -167,36 +165,46 @@ class _MapScreenState extends State<MapScreen> {
           // the fab
           Positioned(
             right: 20.0,
-            bottom: 60,
-            child: SizedBox(
-              height: 55,
-              width: 55,
-              child: FloatingActionButton(
-                backgroundColor: Color(0xFF111111),
-                foregroundColor: Colors.white,
-
-                child: const Icon(
-                  Icons.gps_fixed,
+            bottom: _fabHeight,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 56.h,
+                  width: 56.w,
+                  child: FloatingActionButton(
+                    backgroundColor: const Color(0xFF111111),
+                    foregroundColor: Colors.white,
+                    child: const Icon(
+                      Icons.gps_fixed,
+                    ),
+                    onPressed: () {
+                      getCurrentPosition();
+                    },
+                  ),
                 ),
-                onPressed: () {},
-              ),
+                const SizedBox(height: 5,),
+                Text('현재 위치', style: fabTextStyle,)
+              ],
             ),
           ),
           Positioned(
             right: 20.0,
-            bottom: 125,
-            child: SizedBox(
-              height: 55,
-              width: 55,
-              child: FloatingActionButton(
-                backgroundColor: Color(0xFF01F982),
-                foregroundColor: Colors.black,
-                child: const Icon(
-                  Icons.push_pin,
-
+            bottom: _fabHeight + 75,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 56.h,
+                  width: 56.w,
+                  child: FloatingActionButton(
+                    child: SvgPicture.asset(
+                      'assets/svgs/pin.svg',
+                    ),
+                    onPressed: () {},
+                  ),
                 ),
-                onPressed: () {},
-              ),
+                const SizedBox(height: 5,),
+                Text('핀 생성', style: fabTextStyle,)
+              ],
             ),
           ),
         ],
