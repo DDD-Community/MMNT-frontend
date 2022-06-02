@@ -29,7 +29,9 @@ class _MyAppState extends State<MyApp> {
             home: MapScreen(),
 
             // Dark theme 기반
-            theme: ThemeData.dark().copyWith(
+            theme: ThemeData(
+              fontFamily: 'Pretendard',
+              brightness: Brightness.dark,
               highlightColor: Colors.yellow,
               floatingActionButtonTheme: const FloatingActionButtonThemeData(
                 backgroundColor: Color(0xFFFD6744),
@@ -38,7 +40,6 @@ class _MyAppState extends State<MyApp> {
 
                 // bodyText2가 기본 텍스트 스타일
                 bodyText2: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
-
               ),
             ),
           );
