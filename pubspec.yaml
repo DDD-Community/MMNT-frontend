@@ -37,6 +37,8 @@ flutter:
   assets:
     - assets/styles/
     - assets/svgs/
+    - assets/json/
+    - assets/test/
   fonts:
     - family: Pretendard
       fonts:
