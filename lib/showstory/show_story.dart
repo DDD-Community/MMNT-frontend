@@ -1,4 +1,4 @@
-import 'package:dash_mement/style/image_container.dart';
+import 'package:dash_mement/showstory/component/image_container.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../providers/storylist_provider.dart';

@@ -1,4 +1,4 @@
-import 'package:dash_mement/style/image_container.dart';
+import 'package:dash_mement/showstory/component/image_container.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 

@@ -1,8 +1,7 @@
 class Story {
   late String _title;
   late String _user;
-  late String _date;
-  late String _time;
+  late DateTime _dateTime;
   late String _youtubeLink;
   late String _img;
   late String _message;
@@ -10,13 +9,12 @@ class Story {
   late String _artist;
   late String _location;
 
-  Story(this._title, this._user, this._date, this._time, this._youtubeLink,
-      this._img, this._message, this._trackName, this._artist, this._location);
+  Story(this._title, this._user, this._dateTime, this._youtubeLink, this._img,
+      this._message, this._trackName, this._artist, this._location);
 
   String get title => _title;
   String get user => _user;
-  String get date => _date;
-  String get time => _time;
+  DateTime get dateTime => _dateTime;
   String get link => _youtubeLink;
   String get img => _img;
   String get msg => _message;

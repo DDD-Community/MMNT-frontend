@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/*
+스토리에 관한 텍스트 스타일 모음
+Singleton임
+*/
 class StoryTextStyle {
   late TextStyle _basic_info;
   late TextStyle _title;
