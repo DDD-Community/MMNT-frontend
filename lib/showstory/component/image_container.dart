@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dash_mement/showstory/component/date_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_mement/domain/story.dart';
 
@@ -50,21 +51,25 @@ class ImageContainer extends StatelessWidget {
     }
   }
 
+  Widget _getChild() {
+    return Container(child: DateWidget());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: _storyType == StoryType.Story
-          ? EdgeInsets.fromLTRB(10, 24, 10, 24)
-          : EdgeInsets.all(24),
-      height: _height,
-      width: _width,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          image: DecorationImage(
-              image: _getCurrentImage(), // 여기 api 삽입시 변경
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.4), BlendMode.darken))),
-    );
+        margin: _storyType == StoryType.Story
+            ? EdgeInsets.fromLTRB(10, 24, 10, 24)
+            : EdgeInsets.all(24),
+        height: _height,
+        width: _width,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            image: DecorationImage(
+                image: _getCurrentImage(), // 여기 api 삽입시 변경
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.4), BlendMode.darken))),
+        child: _getChild());
   }
 }
