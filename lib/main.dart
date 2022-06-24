@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
         DateTime.parse("2022-04-02 20:18:04Z"),
         "https://www.youtube.com/watch?v=U3BVFY9wnTw",
         "./assets/test/v1_test.jpg",
-        "밝게 빛나는 별이 되어 너를 비춰줄게 매일 어두워 헤맬 때도 앞이 두려워도 언제나 널 지켜줄게 세상이 널 아프게 할 땐 내가 안아줄게 매일포근한 바람으로 따듯한 햇살로난 널 지켜줄게 매일너의 모든 시간 속에 내가 함께할게",
+        "밝게 빛나는 별이 되어 너를 비춰줄게 매일 어두워 헤맬 때도 앞이 두려워도\b 언제나 널 지켜줄게 세상이 널 아프게 할 땐 내가 안아줄게\n 매일포근한 바람으로 따듯한 햇살로난 널 지켜줄게 매일너의 모든 시간 속에 내가 함께할게",
         "SUN GOES DOWN",
         "Lil Nas X",
         "정릉동");
