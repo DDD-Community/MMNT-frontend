@@ -36,7 +36,7 @@ class StoryTextStyle {
       fontWeight: FontWeight.w500,
       letterSpacing: -0.1,
       color: Colors.white,
-      height: 1.2, // 수정 필요
+      height: 1.6, // 수정 필요
     );
     _trackName = TextStyle(
         fontSize: 20,
