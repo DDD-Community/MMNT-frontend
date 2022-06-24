@@ -1,8 +1,16 @@
 import 'dart:io';
 import 'package:dash_mement/showstory/component/date_widget.dart';
+import 'package:dash_mement/showstory/component/story_column.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_mement/domain/story.dart';
 
+/*
+ enum StoryType
+ Story: 보여주는 스토리일 경우
+ Input: 입력하는 스트리일 경우
+ File: 이미지 파일 삽입인 경우
+ Basic: 
+*/
 enum StoryType { Story, Input, File, Basic }
 
 class ImageContainer extends StatelessWidget {
@@ -52,7 +60,15 @@ class ImageContainer extends StatelessWidget {
   }
 
   Widget _getChild() {
-    return Container(child: DateWidget());
+    if (_storyType == StoryType.Story) {
+      return StoryColumn(_story!);
+    } else if (_storyType == StoryType.File) {
+      return StoryColumn(_story!);
+    } else if (_storyType == StoryType.Input) {
+      return StoryColumn(_story!);
+    } else {
+      return StoryColumn(_story!);
+    }
   }
 
   @override
