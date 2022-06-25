@@ -35,10 +35,16 @@ class _ShowStory extends State<ShowStory> {
   late YoutubePlayerController _youtubePlayerController;
 
   void _postStory() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => PostImage()));
+    _youtubePlayerController.pause();
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => PostImage(_backFromChild)));
   }
 
   void _backButton() {}
+
+  void _backFromChild() {
+    _youtubePlayerController.play();
+  }
 
   @override
   void initState() {
@@ -83,6 +89,7 @@ class _ShowStory extends State<ShowStory> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+          centerTitle: true,
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
