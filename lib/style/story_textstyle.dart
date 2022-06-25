@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 /*
@@ -10,6 +12,10 @@ class StoryTextStyle {
   late TextStyle _message;
   late TextStyle _trackName;
   late TextStyle _artist;
+  late TextStyle _appBarBlack;
+  late TextStyle _appBarWhite;
+  late TextStyle _buttonBlack;
+  late TextStyle _buttonWhite;
 
   static final StoryTextStyle _instance = StoryTextStyle._internal();
 
@@ -50,6 +56,30 @@ class StoryTextStyle {
         fontWeight: FontWeight.w400,
         letterSpacing: -0.43,
         color: Color(0xFF000000));
+    _appBarBlack = TextStyle(
+        fontSize: 18,
+        fontFamily: 'Pretendard',
+        letterSpacing: -0.41,
+        fontWeight: FontWeight.w700,
+        color: Colors.black);
+    _appBarWhite = TextStyle(
+        fontSize: 18,
+        fontFamily: 'Pretendard',
+        letterSpacing: -0.41,
+        fontWeight: FontWeight.w700,
+        color: Colors.white);
+    _buttonBlack = TextStyle(
+        fontSize: 17,
+        fontFamily: 'Pretendard',
+        letterSpacing: -0.41,
+        fontWeight: FontWeight.w700,
+        color: Colors.black);
+    _buttonWhite = TextStyle(
+        fontSize: 17,
+        fontFamily: 'Pretendard',
+        letterSpacing: -0.41,
+        fontWeight: FontWeight.w700,
+        color: Colors.white);
   }
 
   get basicInfo => _basic_info;
@@ -57,4 +87,8 @@ class StoryTextStyle {
   get message => _message;
   get trackName => _trackName;
   get artist => _artist;
+  get appBarBlack => _appBarBlack;
+  get appBarWhite => _appBarWhite;
+  get buttonBlack => _buttonBlack;
+  get buttonWhite => _buttonWhite;
 }

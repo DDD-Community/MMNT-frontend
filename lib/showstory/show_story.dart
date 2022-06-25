@@ -1,3 +1,4 @@
+import 'package:dash_mement/poststory/post_image.dart';
 import 'package:dash_mement/showstory/component/image_container.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -32,6 +33,12 @@ class _ShowStory extends State<ShowStory> {
   //youtube
   List<String> _urlList = [];
   late YoutubePlayerController _youtubePlayerController;
+
+  void _postStory() {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => PostImage()));
+  }
+
+  void _backButton() {}
 
   @override
   void initState() {
@@ -81,7 +88,7 @@ class _ShowStory extends State<ShowStory> {
               Icons.arrow_back_ios,
               color: Colors.black,
             ),
-            onPressed: () => print("back button"),
+            onPressed: () => _backButton(),
           ),
           backgroundColor: Colors.white,
           shadowColor: Colors.transparent,
@@ -129,8 +136,10 @@ class _ShowStory extends State<ShowStory> {
                   )))
         ])),
       ),
-      floatingActionButton:
-          FloatingActionButton(onPressed: () => print('click')),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () => _postStory(),
+          backgroundColor: Color(0xFF5894FC),
+          child: Icon(Icons.add)),
     );
   }
 }
