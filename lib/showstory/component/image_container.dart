@@ -50,9 +50,9 @@ class ImageContainer extends StatelessWidget {
   }
 
   ImageProvider<Object> _getCurrentImage() {
-    if (_story != null) {
+    if (_storyType == StoryType.Story) {
       return AssetImage(_story!.img);
-    } else if (_imageFile != null) {
+    } else if (_storyType == StoryType.File) {
       return FileImage(_imageFile!);
     } else {
       return AssetImage(_imagePath!);
@@ -63,7 +63,7 @@ class ImageContainer extends StatelessWidget {
     if (_storyType == StoryType.Story) {
       return StoryColumn(_story!);
     } else if (_storyType == StoryType.File) {
-      return StoryColumn(_story!);
+      return Container();
     } else if (_storyType == StoryType.Input) {
       return StoryColumn(_story!);
     } else {
