@@ -7,6 +7,9 @@ import 'package:image_picker/image_picker.dart';
 class PostImage extends StatelessWidget {
   Widget _inform = Container();
   final ImagePicker _picker = ImagePicker();
+  late Function _backButton;
+
+  PostImage(this._backButton) {}
 
   void _getImage(BuildContext context) async {
     // Pick an image
@@ -27,6 +30,11 @@ class PostImage extends StatelessWidget {
     }
   }
 
+  void _popWidget(BuildContext context) {
+    _backButton();
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size _buttonSize = Size(MediaQuery.of(context).size.width * 0.9,
@@ -34,8 +42,13 @@ class PostImage extends StatelessWidget {
     return Scaffold(
         backgroundColor: Color(0x1E000000),
         appBar: AppBar(
+          centerTitle: true,
           backgroundColor: Color(0x1E000000),
           title: Text("모먼트 추가하기", style: StoryTextStyle().appBarWhite),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () => _popWidget(context),
+          ),
         ),
         body: Column(children: [
           Expanded(
