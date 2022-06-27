@@ -1,8 +1,8 @@
 import 'package:dash_mement/domain/story.dart';
-import 'package:dash_mement/showstory/component/date_widget.dart';
-import 'package:dash_mement/showstory/component/storytext_widget.dart';
-import 'package:dash_mement/showstory/component/trackInfo_widget.dart';
-import 'package:dash_mement/showstory/component/username_widget.dart';
+import 'package:dash_mement/component/story/date_widget.dart';
+import 'package:dash_mement/component/story/storytext_widget.dart';
+import 'package:dash_mement/component/story/trackInfo_widget.dart';
+import 'package:dash_mement/component/story/username_widget.dart';
 import 'package:flutter/material.dart';
 
 class StoryColumn extends StatelessWidget {

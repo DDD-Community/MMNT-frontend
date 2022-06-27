@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:dash_mement/showstory/component/date_widget.dart';
-import 'package:dash_mement/showstory/component/story_column.dart';
+import 'package:dash_mement/component/story/date_widget.dart';
+import 'package:dash_mement/component/story/story_column.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_mement/domain/story.dart';
 

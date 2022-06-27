@@ -1,3 +1,4 @@
+import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -39,7 +40,8 @@ class TrackInfoWidget extends StatelessWidget {
         width: MediaQuery.of(context).size.width * 0.64,
         height: 78,
         decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(8)),
+            color: MmntStyle().secondBlack,
+            borderRadius: BorderRadius.circular(8)),
         child: Padding(
             padding: EdgeInsets.only(left: 8, right: 8),
             child: Row(
