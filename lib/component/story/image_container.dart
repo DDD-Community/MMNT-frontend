@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dash_mement/component/story/date_widget.dart';
+import 'package:dash_mement/component/story/input_column.dart';
 import 'package:dash_mement/component/story/story_column.dart';
 import 'package:flutter/material.dart';
 import 'package:dash_mement/domain/story.dart';
@@ -52,7 +53,8 @@ class ImageContainer extends StatelessWidget {
   ImageProvider<Object> _getCurrentImage() {
     if (_storyType == StoryType.Story) {
       return AssetImage(_story!.img);
-    } else if (_storyType == StoryType.File) {
+    } else if ((_storyType == StoryType.File) ||
+        (_storyType == StoryType.Input)) {
       return FileImage(_imageFile!);
     } else {
       return AssetImage(_imagePath!);
@@ -65,7 +67,7 @@ class ImageContainer extends StatelessWidget {
     } else if (_storyType == StoryType.File) {
       return Container();
     } else if (_storyType == StoryType.Input) {
-      return StoryColumn(_story!);
+      return InputColumn();
     } else {
       return StoryColumn(_story!);
     }

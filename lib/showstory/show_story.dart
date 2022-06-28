@@ -1,5 +1,7 @@
 import 'package:dash_mement/poststory/post_image.dart';
-import 'package:dash_mement/showstory/component/image_container.dart';
+import 'package:dash_mement/component/story/image_container.dart';
+import 'package:dash_mement/style/mmnt_style.dart';
+import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../providers/storylist_provider.dart';
@@ -87,21 +89,17 @@ class _ShowStory extends State<ShowStory> {
     _percent = _currentValue / _storyList.getLength();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: MmntStyle().mainBlack,
       appBar: AppBar(
           centerTitle: true,
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.black,
-            ),
+            icon: Icon(Icons.arrow_back_ios, color: Color(0xFFD9D9D9)),
             onPressed: () => _backButton(),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: MmntStyle().mainBlack,
           shadowColor: Colors.transparent,
           title: Text("정릉동 #${_currentValue}",
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold))),
+              style: StoryTextStyle().appBarWhite)),
       body: YoutubePlayerBuilder(
         player: YoutubePlayer(
           controller: _youtubePlayerController,
@@ -114,7 +112,7 @@ class _ShowStory extends State<ShowStory> {
               child: Container(
             width: MediaQuery.of(context).size.width * 0.4,
             height: MediaQuery.of(context).size.width * 0.4,
-            color: Colors.white,
+            color: MmntStyle().mainBlack,
           )),
           CarouselSlider(
             items: _storyWidgetList,
@@ -138,15 +136,18 @@ class _ShowStory extends State<ShowStory> {
                   width: MediaQuery.of(context).size.width * 0.6,
                   child: LinearProgressIndicator(
                     value: _percent,
-                    backgroundColor: Color(0xFFD9D9D9),
-                    valueColor: new AlwaysStoppedAnimation(Color(0xFF232323)),
+                    backgroundColor: MmntStyle().secondBlack,
+                    valueColor: new AlwaysStoppedAnimation(MmntStyle().second),
                   )))
         ])),
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () => _postStory(),
-          backgroundColor: Color(0xFF5894FC),
-          child: Icon(Icons.add)),
+          backgroundColor: MmntStyle().primary,
+          child: Icon(
+            Icons.add,
+            color: MmntStyle().mainWhite,
+          )),
     );
   }
 }

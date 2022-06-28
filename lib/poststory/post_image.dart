@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dash_mement/poststory/check_image.dart';
+import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -40,15 +41,19 @@ class PostImage extends StatelessWidget {
     Size _buttonSize = Size(MediaQuery.of(context).size.width * 0.9,
         MediaQuery.of(context).size.height * 0.06);
     return Scaffold(
-        backgroundColor: Color(0x1E000000),
+        backgroundColor: MmntStyle().mainBlack,
         appBar: AppBar(
+          shadowColor: Colors.transparent,
+          automaticallyImplyLeading: false,
           centerTitle: true,
-          backgroundColor: Color(0x1E000000),
+          backgroundColor: MmntStyle().mainBlack,
           title: Text("모먼트 추가하기", style: StoryTextStyle().appBarWhite),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () => _popWidget(context),
-          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.close_outlined),
+              onPressed: () => _popWidget(context),
+            ),
+          ],
         ),
         body: Column(children: [
           Expanded(
@@ -60,6 +65,7 @@ class PostImage extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     fixedSize: _buttonSize,
+                    primary: MmntStyle().primary,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8))),
                 child: Text(
@@ -73,7 +79,7 @@ class PostImage extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     fixedSize: _buttonSize,
-                    primary: Colors.white,
+                    primary: MmntStyle().primaryDisable,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8))),
                 child: Text("새로운 사진 촬영하기", style: StoryTextStyle().buttonBlack),

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:flutter/material.dart';
 
 /*
@@ -25,7 +26,7 @@ class StoryTextStyle {
     _basic_info = TextStyle(
         fontFamily: "Pretendard",
         letterSpacing: -0.1,
-        color: Colors.white,
+        color: MmntStyle().mainWhite,
         fontWeight: FontWeight.w500,
         fontSize: 11,
         height: 1.2 // 수정 필요
@@ -35,13 +36,13 @@ class StoryTextStyle {
         fontFamily: "Pretendard",
         fontWeight: FontWeight.bold,
         letterSpacing: -0.41,
-        color: Colors.white);
+        color: MmntStyle().mainWhite);
     _message = TextStyle(
       fontSize: 14,
       fontFamily: "Pretendard",
       fontWeight: FontWeight.w500,
       letterSpacing: -0.1,
-      color: Colors.white,
+      color: MmntStyle().mainWhite,
       height: 1.6, // 수정 필요
     );
     _trackName = TextStyle(
@@ -49,37 +50,37 @@ class StoryTextStyle {
         fontFamily: 'Pretendard',
         fontWeight: FontWeight.w600,
         letterSpacing: -0.41,
-        color: Color(0xFF000000));
+        color: MmntStyle().mainWhite);
     _artist = TextStyle(
         fontSize: 11,
         fontFamily: 'Pretendard',
         fontWeight: FontWeight.w400,
         letterSpacing: -0.43,
-        color: Color(0xFF000000));
+        color: Color(0xFF9E9FA9));
     _appBarBlack = TextStyle(
         fontSize: 18,
         fontFamily: 'Pretendard',
         letterSpacing: -0.41,
         fontWeight: FontWeight.w700,
-        color: Colors.black);
+        color: MmntStyle().mainBlack);
     _appBarWhite = TextStyle(
         fontSize: 18,
         fontFamily: 'Pretendard',
         letterSpacing: -0.41,
         fontWeight: FontWeight.w700,
-        color: Colors.white);
+        color: MmntStyle().mainWhite);
     _buttonBlack = TextStyle(
         fontSize: 17,
         fontFamily: 'Pretendard',
         letterSpacing: -0.41,
         fontWeight: FontWeight.w700,
-        color: Colors.black);
+        color: MmntStyle().mainBlack);
     _buttonWhite = TextStyle(
         fontSize: 17,
         fontFamily: 'Pretendard',
         letterSpacing: -0.41,
         fontWeight: FontWeight.w700,
-        color: Colors.white);
+        color: MmntStyle().mainWhite);
   }
 
   get basicInfo => _basic_info;

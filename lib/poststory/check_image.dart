@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'package:dash_mement/component/toast/mmnt_toast.dart';
+import 'package:dash_mement/poststory/post_text.dart';
+import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:dash_mement/showstory/component/image_container.dart';
+import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +20,10 @@ class CheckImage extends StatefulWidget {
 class _CheckImage extends State<CheckImage> {
   late FToast _ftoast;
 
-  void _nextButton() {}
+  void _nextButton() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (_) => PostText(this.widget._imageFile)));
+  }
 
   @override
   void initState() {
@@ -29,28 +35,7 @@ class _CheckImage extends State<CheckImage> {
   }
 
   _showToast() {
-    Widget toast = Container(
-        width: 160,
-        decoration: BoxDecoration(
-            color: Color(0xFF262626), borderRadius: BorderRadius.circular(8)),
-        child: Padding(
-            padding: EdgeInsets.all(8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  color: Color(0xFF5894FC),
-                  size: 18,
-                ),
-                Text("사진 불러오기 성공!",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontFamily: 'Pretendard',
-                        fontWeight: FontWeight.w600))
-              ],
-            )));
-
+    Widget toast = MnmtToast(message: "사진 불러오기 성공!", width: 160, radius: 20);
     _ftoast.showToast(
         child: toast,
         toastDuration: Duration(seconds: 3),
@@ -61,18 +46,18 @@ class _CheckImage extends State<CheckImage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: MmntStyle().mainBlack,
         appBar: AppBar(
           centerTitle: true,
           leading: IconButton(
               onPressed: () => Navigator.of(context).pop(),
               icon: Icon(
                 Icons.arrow_back_ios,
-                color: Colors.black,
+                color: MmntStyle().mainWhite,
               )),
           title: Text(
             "사진 불러오기",
-            style: StoryTextStyle().appBarBlack,
+            style: StoryTextStyle().appBarWhite,
           ),
           actions: [
             GestureDetector(
@@ -82,10 +67,10 @@ class _CheckImage extends State<CheckImage> {
                         padding: EdgeInsets.only(right: 12),
                         child: Text("다음",
                             style: TextStyle(
-                                color: Colors.black,
+                                color: MmntStyle().mainWhite,
                                 fontWeight: FontWeight.bold)))))
           ],
-          backgroundColor: Colors.white,
+          backgroundColor: MmntStyle().mainBlack,
           shadowColor: Colors.transparent,
         ),
         body: ImageContainer.file(
