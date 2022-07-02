@@ -1,5 +1,6 @@
 import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/providers/map_provider.dart';
+import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/screens/map_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +62,8 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ListenableProvider(create: (_) => MapProvider()),
-        ChangeNotifierProvider(create: (_) => StoryListProvider(_storyList))
+        ChangeNotifierProvider(create: (_) => StoryListProvider(_storyList)),
+        ChangeNotifierProvider(create: (_) => PushStoryProvider())
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),

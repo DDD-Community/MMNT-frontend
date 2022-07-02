@@ -10,8 +10,8 @@ class StoryText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        width: MediaQuery.of(context).size.width * 0.5,
-        decoration: BoxDecoration(color: Color(0x99000000)),
+        width: MediaQuery.of(context).size.width * 0.74,
+        // decoration: BoxDecoration(color: Color(0x99000000)),
         child: Padding(
             padding: EdgeInsets.all(22),
             child: Column(children: [
@@ -22,11 +22,15 @@ class StoryText extends StatelessWidget {
                     style: StoryTextStyle().title,
                     textAlign: TextAlign.center,
                   )),
-              Text(
-                _message,
-                style: StoryTextStyle().message,
-                textAlign: TextAlign.center,
-              )
+              Container(
+                  decoration: BoxDecoration(color: Color(0x99000000)),
+                  child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        _message,
+                        style: StoryTextStyle().message,
+                        textAlign: TextAlign.center,
+                      )))
             ])));
   }
 }

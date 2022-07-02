@@ -1,5 +1,6 @@
 import 'package:dash_mement/poststory/post_image.dart';
 import 'package:dash_mement/component/story/image_container.dart';
+import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +9,14 @@ import '../providers/storylist_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:provider/provider.dart';
 
 /* 
 showStory는 유튜브 처음 링크 필요
 나머지 데이터는 provider로 생성
 
 Issue: story text 크기 제한
-Issue: Appbar 안드로이드에서는 중앙정렬이 안됨
+Issue: location에 대한 재정의 필요, dependency: story, pushstory_provider 이하 위젯 
 */
 class ShowStory extends StatefulWidget {
   late String _initialVideoLink;
@@ -28,6 +30,7 @@ class ShowStory extends StatefulWidget {
 
 class _ShowStory extends State<ShowStory> {
   late StoryListProvider _storyList;
+  late PushStoryProvider _pushStory;
   List<ImageContainer> _storyWidgetList = [];
   late double _percent;
   int _currentValue = 1;
@@ -36,14 +39,29 @@ class _ShowStory extends State<ShowStory> {
   List<String> _urlList = [];
   late YoutubePlayerController _youtubePlayerController;
 
-  void _postStory() {
+  void _postStory(String location, PushStoryProvider provider) {
     _youtubePlayerController.pause();
+    // MultiProvider(providers: [
+    //   ChangeNotifierProvider(
+    //     create: (_) => PushStoryProvider(location),
+    //   )
+    // ], child: PostImage(_backFromChild));
+    provider.location = location;
     Navigator.push(
         context, MaterialPageRoute(builder: (_) => PostImage(_backFromChild)));
+    // Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //         builder: (_) => MultiProvider(providers: [
+    //               ChangeNotifierProvider(
+    //                 create: (_) => PushStoryProvider(location),
+    //               )
+    //             ], child: PostImage(_backFromChild))));
   }
 
   void _backButton() {}
 
+  //youtube 재생 기능(차일드가 꺼지면...)
   void _backFromChild() {
     _youtubePlayerController.play();
   }
@@ -76,6 +94,7 @@ class _ShowStory extends State<ShowStory> {
   @override
   Widget build(BuildContext context) {
     _storyList = Provider.of<StoryListProvider>(context);
+    _pushStory = Provider.of<PushStoryProvider>(context);
 
     //storywidget 생성 / urlList 생성
     _storyWidgetList = [];
@@ -88,6 +107,8 @@ class _ShowStory extends State<ShowStory> {
 
     _percent = _currentValue / _storyList.getLength();
 
+    String _location = _storyList.getStoryAt(0).location;
+
     return Scaffold(
       backgroundColor: MmntStyle().mainBlack,
       appBar: AppBar(
@@ -98,7 +119,7 @@ class _ShowStory extends State<ShowStory> {
           ),
           backgroundColor: MmntStyle().mainBlack,
           shadowColor: Colors.transparent,
-          title: Text("정릉동 #${_currentValue}",
+          title: Text("${_location} #${_currentValue}",
               style: StoryTextStyle().appBarWhite)),
       body: YoutubePlayerBuilder(
         player: YoutubePlayer(
@@ -142,7 +163,7 @@ class _ShowStory extends State<ShowStory> {
         ])),
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () => _postStory(),
+          onPressed: () => _postStory(_location, _pushStory),
           backgroundColor: MmntStyle().primary,
           child: Icon(
             Icons.add,
