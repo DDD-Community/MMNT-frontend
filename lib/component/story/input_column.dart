@@ -1,8 +1,10 @@
 import 'package:dash_mement/component/story/date_widget.dart';
 import 'package:dash_mement/component/story/username_widget.dart';
+import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class InputColumn extends StatefulWidget {
   @override
@@ -73,6 +75,7 @@ class _InputColumn extends State<InputColumn> {
 
   @override
   Widget build(BuildContext context) {
+    PushStoryProvider _pushStory = Provider.of<PushStoryProvider>(context);
     return SingleChildScrollView(
         child:
             Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
@@ -98,6 +101,9 @@ class _InputColumn extends State<InputColumn> {
                   style: StoryTextStyle().title,
                   onFieldSubmitted: (_) =>
                       FocusScope.of(context).requestFocus(_contextFocus),
+                  onChanged: (text) {
+                    _pushStory.title = text;
+                  },
                   decoration: InputDecoration(
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
@@ -118,6 +124,9 @@ class _InputColumn extends State<InputColumn> {
                     LengthLimitingTextInputFormatter(80)
                   ], //일단 80제한
                   style: StoryTextStyle().message,
+                  onChanged: (text) {
+                    _pushStory.context = text;
+                  },
                   decoration: InputDecoration(
                       fillColor: Color(0xBD000000),
                       filled: true,
