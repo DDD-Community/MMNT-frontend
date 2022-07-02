@@ -2,6 +2,7 @@ import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/screens/map_screen.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -58,7 +59,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     List<Story> _storyList = _makeStoryTest();
+
     return MultiProvider(
       providers: [
         ListenableProvider(create: (_) => MapProvider()),

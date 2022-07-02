@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dash.dash_mement">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="dash_mement"
         android:name="${applicationName}"
