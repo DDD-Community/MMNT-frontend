@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class PushStoryProvider extends ChangeNotifier {
-  late String _title;
+  String _title = "";
   late String _user;
   late DateTime _dateTime;
   late String _youtubeLink;
   late File _img;
-  late String _message;
+  String _message = "";
   late String _trackName;
   late String _artist;
   late String _location;

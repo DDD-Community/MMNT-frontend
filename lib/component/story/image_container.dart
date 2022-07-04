@@ -91,7 +91,6 @@ class ImageContainer extends StatelessWidget {
     assert(_storyType == StoryType.Input, "Not StoryType Input");
     Map<String, dynamic> hi = {};
     print("imageContainer");
-    print(_childInput.test());
     return hi;
   }
 

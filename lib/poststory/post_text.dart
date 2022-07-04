@@ -6,6 +6,7 @@ import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class PostText extends StatefulWidget {
   late File _imageFile;
@@ -20,6 +21,7 @@ class PostText extends StatefulWidget {
 class _PostText extends State<PostText> {
   late ImageContainer _imageContainer;
   late PushStoryProvider _pushStory;
+  late PanelController _panelController;
 
   @override
   void initState() {
@@ -28,6 +30,7 @@ class _PostText extends State<PostText> {
       _imageContainer = ImageContainer.textInput(
           MediaQuery.of(context).size, this.widget._imageFile);
     });
+    _panelController = PanelController();
   }
 
   @override
@@ -46,6 +49,10 @@ class _PostText extends State<PostText> {
     print(_pushStory.dateTime);
     print(_pushStory.path.toString());
     print(_pushStory.location);
+    print(_pushStory.title);
+    print(_pushStory.context);
+    FocusScope.of(context).unfocus();
+    _panelController.open();
   }
 
   @override
@@ -70,7 +77,35 @@ class _PostText extends State<PostText> {
           ],
         ),
         backgroundColor: MmntStyle().mainBlack,
-        body: ImageContainer.textInput(
-            MediaQuery.of(context).size, this.widget._imageFile));
+        body: SlidingUpPanel(
+          controller: _panelController,
+          backdropEnabled: true,
+          minHeight: 0,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+          panel: Container(
+              decoration: BoxDecoration(
+                  color: MmntStyle().mainBlack,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12))),
+              child: Column(children: [
+                Text("음악추가하기",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.none,
+                        color: Colors.white)),
+                Text("hihaihdfiahfdi",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.none,
+                        color: Colors.white)),
+                TextField()
+              ])),
+          body: ImageContainer.textInput(
+              MediaQuery.of(context).size, this.widget._imageFile),
+        ));
   }
 }
