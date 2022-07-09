@@ -7,6 +7,8 @@ import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:external_app_launcher/external_app_launcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class PostText extends StatefulWidget {
   late File _imageFile;
@@ -18,10 +20,17 @@ class PostText extends StatefulWidget {
   }
 }
 
-class _PostText extends State<PostText> {
+class _PostText extends State<PostText> with SingleTickerProviderStateMixin {
   late ImageContainer _imageContainer;
   late PushStoryProvider _pushStory;
   late PanelController _panelController;
+  late TextEditingController _linkEditController;
+  late YoutubePlayerController _playerController;
+  late AnimationController _animationController;
+  late Animation _animation;
+  String _youtubeGoButtonString = "유튜브에서 링크 가져오기";
+  String _inputSongInfoButton = "음악 정보 입력하기";
+  bool _youtubeCheck = false;
 
   @override
   void initState() {
@@ -31,10 +40,22 @@ class _PostText extends State<PostText> {
           MediaQuery.of(context).size, this.widget._imageFile);
     });
     _panelController = PanelController();
+    _linkEditController = TextEditingController();
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200))
+      ..addListener(() {
+        setState(() {});
+      });
+
+    _animation =
+        ColorTween(begin: MmntStyle().primaryDisable, end: MmntStyle().primary)
+            .animate(_animationController);
   }
 
   @override
   void dispose() {
+    _animationController.dispose();
+    _linkEditController.dispose();
     super.dispose();
   }
 
@@ -53,6 +74,29 @@ class _PostText extends State<PostText> {
     print(_pushStory.context);
     FocusScope.of(context).unfocus();
     _panelController.open();
+  }
+
+  void _pannelButtonClick() {
+    if (_youtubeCheck) {
+    } else {
+      _youtubeOpen();
+    }
+  }
+
+  void _youtubeOpen() async {
+    await LaunchApp.openApp(
+        androidPackageName: "com.google.android.youtube",
+        iosUrlScheme: "http://www.youtube.com/");
+  }
+
+  void _rightUrl(String text) async {
+    String? url = await YoutubePlayer.convertUrlToId(text);
+    if (url != null) {
+      setState(() {
+        _youtubeCheck = true;
+        _animationController.forward();
+      });
+    }
   }
 
   @override
@@ -89,21 +133,82 @@ class _PostText extends State<PostText> {
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(12),
                       topRight: Radius.circular(12))),
-              child: Column(children: [
-                Text("음악추가하기",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.none,
-                        color: Colors.white)),
-                Text("hihaihdfiahfdi",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.none,
-                        color: Colors.white)),
-                TextField()
-              ])),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.fromLTRB(20, 40, 0, 12),
+                        child: Text("음악추가하기",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontFamily: 'Pretendard',
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.41,
+                                height: 1.2,
+                                color: Colors.white))),
+                    Padding(
+                        padding: EdgeInsets.only(left: 20),
+                        child: Text("유튜브에서 원하는 음악의 링크를 복사 후 붙여넣으면",
+                            style: TextStyle(
+                                fontFamily: 'Pretendard',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: -0.41,
+                                height: 1.2,
+                                color: Color(0xCCFFFFFF)))),
+                    Padding(
+                        padding: EdgeInsets.only(left: 20),
+                        child: RichText(
+                            text: TextSpan(
+                                style: TextStyle(
+                                    fontFamily: 'Pretendard',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    letterSpacing: -0.41,
+                                    height: 1.2,
+                                    color: Color(0xCCFFFFFF)),
+                                children: [
+                              TextSpan(
+                                  text: "00:00 ~ 1:00",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  )),
+                              TextSpan(text: " 구간이 스토리에 삽입됩니다.")
+                            ]))),
+                    Container(
+                        width: MediaQuery.of(context).size.width - 20,
+                        padding: EdgeInsets.only(left: 20, top: 24),
+                        child: TextFormField(
+                          cursorColor: Colors.white,
+                          onChanged: (text) => _rightUrl(text),
+                          decoration: InputDecoration(
+                              fillColor: Color(0xFF262626),
+                              hintText: "이곳에 링크 주소를 입력해주세요",
+                              filled: true,
+                              suffixIcon: Icon(
+                                Icons.check_circle,
+                                color: _animation.value,
+                              ),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(4))),
+                        )),
+                    Padding(
+                        padding: EdgeInsets.only(left: 20, top: 24, right: 20),
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                fixedSize: Size(
+                                    MediaQuery.of(context).size.width - 20,
+                                    MediaQuery.of(context).size.height * 0.08),
+                                primary: MmntStyle().primary),
+                            onPressed: () => _pannelButtonClick(),
+                            child: Text(
+                                !_youtubeCheck
+                                    ? _youtubeGoButtonString
+                                    : _inputSongInfoButton,
+                                style: StoryTextStyle().buttonWhite)))
+                  ])),
           body: ImageContainer.textInput(
               MediaQuery.of(context).size, this.widget._imageFile),
         ));
