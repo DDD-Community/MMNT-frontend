@@ -35,7 +35,7 @@ class _MapScreenState extends State<MapScreen> {
   GlobalKey? _keyGoogleMap = GlobalKey();
   bool _isCameraReCenter = false;
   static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(0.347596, 32.582520),
+    target: LatLng(37.532600, 127.024612),
     zoom: 14.4746,
   );
   final Map<String, Marker> _markers = {};
