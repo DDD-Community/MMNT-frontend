@@ -6,8 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'dongwon_test/test.dart';
 import 'providers/storylist_provider.dart';
 import 'showstory/show_story.dart';
 
@@ -59,7 +57,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     List<Story> _storyList = _makeStoryTest();
 

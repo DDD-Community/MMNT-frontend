@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dash_mement/component/story/image_container.dart';
+import 'package:dash_mement/component/toast/mmnt_toast.dart';
+import 'package:dash_mement/component/toast/mmnterror_toast.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
@@ -9,6 +11,9 @@ import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart'
+    as LocalProgressBar;
 
 class PostText extends StatefulWidget {
   late File _imageFile;
@@ -20,17 +25,27 @@ class PostText extends StatefulWidget {
   }
 }
 
-class _PostText extends State<PostText> with SingleTickerProviderStateMixin {
+class _PostText extends State<PostText> with TickerProviderStateMixin {
   late ImageContainer _imageContainer;
   late PushStoryProvider _pushStory;
   late PanelController _panelController;
   late TextEditingController _linkEditController;
+  late TextEditingController _trackNameController;
+  late TextEditingController _artistController;
   late YoutubePlayerController _playerController;
   late AnimationController _animationController;
   late Animation _animation;
+  late AnimationController _iconAnimationController;
+  late FToast _ftoast;
+
   String _youtubeGoButtonString = "유튜브에서 링크 가져오기";
   String _inputSongInfoButton = "음악 정보 입력하기";
   bool _youtubeCheck = false;
+  late String _youtubeId;
+  bool _youtubePlay = false;
+  bool _inputInfo = false;
+
+  late double _testWidth;
 
   @override
   void initState() {
@@ -41,6 +56,8 @@ class _PostText extends State<PostText> with SingleTickerProviderStateMixin {
     });
     _panelController = PanelController();
     _linkEditController = TextEditingController();
+    _trackNameController = TextEditingController();
+    _artistController = TextEditingController();
     _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200))
       ..addListener(() {
@@ -50,13 +67,26 @@ class _PostText extends State<PostText> with SingleTickerProviderStateMixin {
     _animation =
         ColorTween(begin: MmntStyle().primaryDisable, end: MmntStyle().primary)
             .animate(_animationController);
+
+    _iconAnimationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
   }
 
   @override
   void dispose() {
+    _iconAnimationController.dispose();
     _animationController.dispose();
     _linkEditController.dispose();
+    _playerController.dispose();
+    _artistController.dispose();
+    _trackNameController.dispose();
     super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    _playerController.pause();
+    super.deactivate();
   }
 
   void _backButton(BuildContext context) {
@@ -64,7 +94,12 @@ class _PostText extends State<PostText> with SingleTickerProviderStateMixin {
   }
 
   void _submit(BuildContext context, PushStoryProvider pushStory) {
-    print("yes");
+    if (_pushStory.title == "" || _pushStory.context == "") {
+      _ftoast = FToast();
+      _ftoast.init(context);
+      _showToast();
+      return;
+    }
     _pushStory.path = this.widget._imageFile; // 파일 설정
 
     print(_pushStory.dateTime);
@@ -72,13 +107,46 @@ class _PostText extends State<PostText> with SingleTickerProviderStateMixin {
     print(_pushStory.location);
     print(_pushStory.title);
     print(_pushStory.context);
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).unfocus(); // 키보드 내리기
     _panelController.open();
+
+    // _pushStory.path = this.widget._imageFile; // 파일 설정
+
+    // print(_pushStory.dateTime);
+    // print(_pushStory.path.toString());
+    // print(_pushStory.location);
+    // print(_pushStory.title);
+    // print(_pushStory.context);
+    // FocusScope.of(context).unfocus(); // 키보드 내리기
+    // _panelController.open();
+  }
+
+  void _showToast() {
+    Widget toast =
+        MnmtErrorToast(message: "제목과 본문을 작성해주세요.", width: 220, radius: 8);
+    final viewInsets = EdgeInsets.fromWindowPadding(
+        WidgetsBinding.instance.window.viewInsets,
+        WidgetsBinding.instance.window.devicePixelRatio);
+    _ftoast.showToast(
+        child: toast,
+        gravity: ToastGravity.TOP,
+        toastDuration: Duration(seconds: 3),
+        positionedToastBuilder: (context, child) => Positioned(
+            bottom: viewInsets.bottom + 12,
+            left: 0.0,
+            right: 0.0,
+            child: child));
   }
 
   void _pannelButtonClick() {
+    // 음악 정보 입력하기
     if (_youtubeCheck) {
-    } else {
+      setState(() {
+        _inputInfo = true;
+      });
+    }
+    // 유튜브 링크 열기
+    else {
       _youtubeOpen();
     }
   }
@@ -90,18 +158,45 @@ class _PostText extends State<PostText> with SingleTickerProviderStateMixin {
   }
 
   void _rightUrl(String text) async {
-    String? url = await YoutubePlayer.convertUrlToId(text);
-    if (url != null) {
+    String? id = await YoutubePlayer.convertUrlToId(text);
+    if (id != null) {
+      FocusScope.of(context).unfocus();
       setState(() {
+        _youtubeId = id;
+        _playerController = YoutubePlayerController(
+            initialVideoId: _youtubeId,
+            flags: YoutubePlayerFlags(endAt: 60, autoPlay: true, loop: true));
         _youtubeCheck = true;
         _animationController.forward();
       });
+    } else {
+      setState(() {
+        _youtubeCheck = false;
+        _animationController.reverse();
+      });
     }
+  }
+
+  void _postAll() async {}
+
+  Stream<DurationState> _getDuration() {
+    Stream<DurationState> stream =
+        Stream.periodic(Duration(microseconds: 1), (_) {
+      Duration progress = _playerController.value.position;
+      Duration buffered = _playerController.metadata.duration *
+          _playerController.value.buffered;
+      return DurationState(progress: progress, buffered: buffered);
+    });
+    return stream;
   }
 
   @override
   Widget build(BuildContext context) {
     _pushStory = Provider.of<PushStoryProvider>(context);
+
+    double _widgetWidth = MediaQuery.of(context).size.width - 20;
+    double _widgetHeight = MediaQuery.of(context).size.height * 0.08;
+
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -133,84 +228,258 @@ class _PostText extends State<PostText> with SingleTickerProviderStateMixin {
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(12),
                       topRight: Radius.circular(12))),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(20, 40, 0, 12),
-                        child: Text("음악추가하기",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 24,
-                                fontFamily: 'Pretendard',
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.41,
-                                height: 1.2,
-                                color: Colors.white))),
-                    Padding(
-                        padding: EdgeInsets.only(left: 20),
-                        child: Text("유튜브에서 원하는 음악의 링크를 복사 후 붙여넣으면",
-                            style: TextStyle(
-                                fontFamily: 'Pretendard',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                letterSpacing: -0.41,
-                                height: 1.2,
-                                color: Color(0xCCFFFFFF)))),
-                    Padding(
-                        padding: EdgeInsets.only(left: 20),
-                        child: RichText(
-                            text: TextSpan(
-                                style: TextStyle(
-                                    fontFamily: 'Pretendard',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    letterSpacing: -0.41,
-                                    height: 1.2,
-                                    color: Color(0xCCFFFFFF)),
-                                children: [
-                              TextSpan(
-                                  text: "00:00 ~ 1:00",
+              child: !_inputInfo
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                          Container(
+                              width: MediaQuery.of(context).size.width,
+                              margin: EdgeInsets.only(top: 20, bottom: 12),
+                              child:
+                                  Stack(alignment: Alignment.center, children: [
+                                Positioned(
+                                    child: Text("음악추가하기",
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontFamily: 'Pretendard',
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: -0.41,
+                                            height: 1.2,
+                                            color: Colors.white))),
+                                Positioned(
+                                    right: 12,
+                                    child: IconButton(
+                                      icon: Icon(Icons.clear_outlined),
+                                      onPressed: () => _panelController.close(),
+                                    ))
+                              ])),
+                          Container(
+                              width: _widgetWidth,
+                              margin: EdgeInsets.only(right: 20, left: 20),
+                              child: Divider(
+                                  color: Color(0x44747474), thickness: 1.0)),
+                          Padding(
+                              padding: EdgeInsets.only(left: 20, top: 12),
+                              child: Text("유튜브에서 원하는 음악의 링크를 복사 후 붙여넣으면",
                                   style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                  )),
-                              TextSpan(text: " 구간이 스토리에 삽입됩니다.")
-                            ]))),
-                    Container(
-                        width: MediaQuery.of(context).size.width - 20,
-                        padding: EdgeInsets.only(left: 20, top: 24),
-                        child: TextFormField(
-                          cursorColor: Colors.white,
-                          onChanged: (text) => _rightUrl(text),
-                          decoration: InputDecoration(
-                              fillColor: Color(0xFF262626),
-                              hintText: "이곳에 링크 주소를 입력해주세요",
-                              filled: true,
-                              suffixIcon: Icon(
-                                Icons.check_circle,
-                                color: _animation.value,
-                              ),
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(4))),
-                        )),
-                    Padding(
-                        padding: EdgeInsets.only(left: 20, top: 24, right: 20),
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                fixedSize: Size(
-                                    MediaQuery.of(context).size.width - 20,
-                                    MediaQuery.of(context).size.height * 0.08),
-                                primary: MmntStyle().primary),
-                            onPressed: () => _pannelButtonClick(),
-                            child: Text(
-                                !_youtubeCheck
-                                    ? _youtubeGoButtonString
-                                    : _inputSongInfoButton,
-                                style: StoryTextStyle().buttonWhite)))
-                  ])),
+                                      fontFamily: 'Pretendard',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      letterSpacing: -0.41,
+                                      height: 1.2,
+                                      color: Color(0xCCFFFFFF)))),
+                          Padding(
+                              padding: EdgeInsets.only(left: 20),
+                              child: RichText(
+                                  text: TextSpan(
+                                      style: TextStyle(
+                                          fontFamily: 'Pretendard',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                          letterSpacing: -0.41,
+                                          height: 1.2,
+                                          color: Color(0xCCFFFFFF)),
+                                      children: [
+                                    TextSpan(
+                                        text: "00:00 ~ 1:00",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                        )),
+                                    TextSpan(text: " 구간이 스토리에 삽입됩니다.")
+                                  ]))),
+                          Container(
+                              width: _widgetWidth,
+                              padding: EdgeInsets.only(left: 20, top: 24),
+                              child: TextFormField(
+                                controller: _linkEditController,
+                                cursorColor: Colors.white,
+                                onChanged: (text) => _rightUrl(text),
+                                decoration: InputDecoration(
+                                    fillColor: Color(0xFF262626),
+                                    hintText: "이곳에 링크 주소를 입력해주세요",
+                                    filled: true,
+                                    suffixIcon: Icon(
+                                      Icons.check_circle,
+                                      color: _animation.value,
+                                    ),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                        borderRadius:
+                                            BorderRadius.circular(4))),
+                              )),
+                          !_youtubeCheck
+                              ? Container()
+                              : YoutubePlayerBuilder(
+                                  player: YoutubePlayer(
+                                    width: 10,
+                                    controller: _playerController,
+                                  ),
+                                  builder: (context, player) =>
+                                      Stack(children: [
+                                        Positioned(
+                                            left: 10, top: 10, child: player),
+                                        Positioned(
+                                            child: Container(
+                                                height: 40,
+                                                width: 40,
+                                                color: MmntStyle().mainBlack)),
+                                        Container(
+                                            margin: EdgeInsets.fromLTRB(
+                                                20, 12, 20, 12),
+                                            width: _widgetWidth,
+                                            child: StreamBuilder<DurationState>(
+                                                stream: _getDuration(),
+                                                builder: (context, snapshot) {
+                                                  final DurationState?
+                                                      durationState =
+                                                      snapshot.data;
+                                                  Duration progress =
+                                                      durationState?.progress ??
+                                                          Duration.zero;
+                                                  Duration buffered =
+                                                      durationState?.buffered ??
+                                                          Duration.zero;
+                                                  if (buffered >
+                                                      Duration(
+                                                          milliseconds:
+                                                              59000)) {
+                                                    buffered = Duration(
+                                                        milliseconds: 60000);
+                                                  }
+                                                  return LocalProgressBar
+                                                      .ProgressBar(
+                                                          progress: progress,
+                                                          buffered: buffered,
+                                                          total: const Duration(
+                                                              minutes: 1),
+                                                          progressBarColor:
+                                                              MmntStyle()
+                                                                  .primary,
+                                                          thumbColor:
+                                                              MmntStyle()
+                                                                  .primary,
+                                                          baseBarColor: Colors
+                                                              .white
+                                                              .withOpacity(
+                                                                  0.24),
+                                                          bufferedBarColor:
+                                                              Colors.white
+                                                                  .withOpacity(
+                                                                      0.24),
+                                                          onSeek: (duration) {
+                                                            _playerController
+                                                                .seekTo(
+                                                                    duration);
+                                                          });
+                                                }))
+                                      ])),
+                          Padding(
+                              padding:
+                                  EdgeInsets.only(left: 20, top: 24, right: 20),
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      fixedSize:
+                                          Size(_widgetWidth, _widgetHeight),
+                                      primary: MmntStyle().primary),
+                                  onPressed: () => _pannelButtonClick(),
+                                  child: Text(
+                                      !_youtubeCheck
+                                          ? _youtubeGoButtonString
+                                          : _inputSongInfoButton,
+                                      style: StoryTextStyle().buttonWhite)))
+                        ])
+                  : Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.arrow_back_ios),
+                                  onPressed: () => setState(() {
+                                    _inputInfo = false;
+                                  }),
+                                ),
+                                Text("음악 정보 입력하기"),
+                                IconButton(
+                                  icon: Icon(Icons.clear_outlined),
+                                  onPressed: () => _panelController.close(),
+                                )
+                              ]),
+                          Container(
+                              width: _widgetWidth,
+                              margin: EdgeInsets.only(right: 10, left: 10),
+                              child: Divider(
+                                  color: Color(0x44747474), thickness: 1.0)),
+                          Padding(
+                              padding: EdgeInsets.only(left: 10, top: 12),
+                              child: Text("음원의 공식적인 곡명과",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w400))),
+                          Padding(
+                              padding: EdgeInsets.only(left: 10),
+                              child: Text("아티스트명을 입력해 주세요",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w400))),
+                          Container(
+                              width: _widgetWidth,
+                              padding:
+                                  EdgeInsets.only(left: 10, top: 24, right: 10),
+                              child: TextFormField(
+                                  controller: _trackNameController,
+                                  decoration: InputDecoration(
+                                      fillColor: Color(0xFF262626),
+                                      hintText: "곡 제목을 입력해주세요",
+                                      filled: true,
+                                      // suffixIcon: Icon(
+                                      //   Icons.check_circle,
+                                      // ),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                          borderRadius:
+                                              BorderRadius.circular(4))))),
+                          Container(
+                              width: _widgetWidth,
+                              padding:
+                                  EdgeInsets.only(left: 10, top: 12, right: 10),
+                              child: TextFormField(
+                                  controller: _artistController,
+                                  decoration: InputDecoration(
+                                      fillColor: Color(0xFF262626),
+                                      hintText: "아티스트명을 입력해주세요",
+                                      filled: true,
+                                      // suffixIcon: Icon(
+                                      //   Icons.check_circle,
+                                      // ),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                          borderRadius:
+                                              BorderRadius.circular(4))))),
+                          Padding(
+                              padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      fixedSize:
+                                          Size(_widgetWidth, _widgetHeight),
+                                      primary: MmntStyle().primary),
+                                  onPressed: () => _postAll(),
+                                  child: Text("완료",
+                                      style: StoryTextStyle().buttonWhite)))
+                        ],
+                      ))),
           body: ImageContainer.textInput(
               MediaQuery.of(context).size, this.widget._imageFile),
         ));
   }
+}
+
+class DurationState {
+  final Duration progress;
+  final Duration buffered;
+  const DurationState({required this.progress, required this.buffered});
 }

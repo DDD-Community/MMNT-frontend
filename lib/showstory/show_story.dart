@@ -147,7 +147,8 @@ class _ShowStory extends State<ShowStory> {
                 height: MediaQuery.of(context).size.height *
                     0.92, // carousel height
                 enableInfiniteScroll: false, // 무한 스크롤
-                autoPlay: false, // 자동 넘김
+                autoPlay: true, // 자동 넘김
+                autoPlayInterval: const Duration(minutes: 1),
                 viewportFraction: 0.9), // viewport
           ),
           // linear indicator

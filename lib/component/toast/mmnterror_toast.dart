@@ -29,11 +29,11 @@ class MnmtErrorToast extends StatelessWidget {
                 Icon(
                   Icons.error,
                   color: Color(0xFFFD6744),
-                  size: 18,
+                  size: 20,
                 ),
                 Text(_message,
                     style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontFamily: 'Pretendard',
                         fontWeight: FontWeight.w600)),
               ],
