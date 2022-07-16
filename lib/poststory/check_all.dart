@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dash_mement/component/story/image_container.dart';
+import 'package:dash_mement/component/toast/mmnterror_toast.dart';
 import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
@@ -10,6 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CheckAll extends StatefulWidget {
   String _youtubeId;
@@ -23,13 +27,25 @@ class CheckAll extends StatefulWidget {
 class _CheckAll extends State<CheckAll> {
   late PushStoryProvider _pushStoryProvider;
   late YoutubePlayerController _youtubePlayerController;
+  late FToast _ftoast;
 
   @override
   void initState() {
     _youtubePlayerController = YoutubePlayerController(
         initialVideoId: this.widget._youtubeId,
         flags: YoutubePlayerFlags(autoPlay: true, loop: true, endAt: 60));
+    _ftoast = FToast();
+    _ftoast.init(context);
     super.initState();
+  }
+
+  _showToast() {
+    Widget toast = MnmtErrorToast(message: "업로드 실패!", width: 180);
+    _ftoast.showToast(
+        child: toast,
+        toastDuration: Duration(milliseconds: 3000),
+        positionedToastBuilder: (context, child) =>
+            Positioned(bottom: 80, left: 0.0, right: 0.0, child: child));
   }
 
   @override
@@ -44,34 +60,65 @@ class _CheckAll extends State<CheckAll> {
     super.dispose();
   }
 
-  String _geCurrenttUser() {
+  String _getCurrenttUser() {
     return "Test_User";
   }
 
-  void _submit() {
+  String _getCurrentUserToken() {
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NTc5ODk4MjIsImV4cCI6MTY1Nzk5MzQyMn0.hGzcBaEPUbts5I8dce8xdPSHtJQFb5HgSmR_sWTIycE";
+  }
+
+  void _submit() async {
     print(_pushStoryProvider.latitude_y);
     print(_pushStoryProvider.longitude_x);
-    _uploadUrl(_pushStoryProvider.path);
+    String imageUrl = await _uploadUrl(_pushStoryProvider.path);
+    if (imageUrl == "ERROR") {
+      print("error"); // 에러 처리 해줘야함
+    } else {
+      final postUrl = Uri.parse("https://dev.mmnt.link/moment");
+      final token = _getCurrentUserToken();
+      try {
+        var data = {
+          "pinX": _pushStoryProvider.longitude_x,
+          "pinY": _pushStoryProvider.latitude_y,
+          "title": _pushStoryProvider.title,
+          "description": _pushStoryProvider.context,
+          "imageUrl": postUrl,
+          "youtubeUrl": _pushStoryProvider.link,
+          "music": _pushStoryProvider.track,
+          "artist": _pushStoryProvider.artist
+        };
+        var body = json.encode(data);
+
+        http.Response response = await http.post(postUrl,
+            headers: <String, String>{
+              'Content-Type': 'application/json',
+              'Authorization': 'bearer $token'
+            },
+            body: body);
+        print("flutter post test: ${response.body}");
+      } catch (e) {
+        print("flutter_error: ${e.toString()}");
+        _showToast();
+      }
+    }
   }
 
   Future<String> _uploadUrl(File file) async {
+    final url = Uri.parse("https://dev.mmnt.link/upload");
+
     var dio = new Dio();
-    var formData = FormData.fromMap(
-        {'image': await MultipartFile.fromFile(_pushStoryProvider.path.path)});
+    var formData =
+        FormData.fromMap({'file': await MultipartFile.fromFile(file.path)});
     try {
-      dio.options.contentType = 'multipart/form-data';
-
-      var response = await dio.patch(
-        "https://dev.mmnt.link/upload",
-        data: formData,
-      );
-      print('성공적으로 업로드했습니다');
-      print("플러터: ${response.data}");
+      final response =
+          await dio.post("https://dev.mmnt.link/upload", data: formData);
+      String imageUrl = response.data["result"]["imageUrl"];
+      print("플러터 테스트: ${imageUrl}");
+      return imageUrl;
     } catch (e) {
-      print(e);
+      return "ERROR";
     }
-
-    return "hi";
   }
 
   @override
@@ -120,7 +167,7 @@ class _CheckAll extends State<CheckAll> {
                       _pushStoryProvider.path,
                       Story(
                           _pushStoryProvider.title,
-                          _geCurrenttUser(), // user
+                          _getCurrenttUser(), // user
                           _pushStoryProvider.dateTime,
                           _pushStoryProvider.link,
                           "", // img
