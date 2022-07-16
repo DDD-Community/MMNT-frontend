@@ -131,8 +131,11 @@ class _ShowStory extends State<ShowStory> {
               future: _getAddress(lat_y, lng_x),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Text("${snapshot.data.toString()} #${_currentValue}",
-                      style: StoryTextStyle().appBarWhite);
+                  return Text(
+                    "${snapshot.data.toString()} #${_currentValue}",
+                    style: StoryTextStyle().appBarWhite,
+                    overflow: TextOverflow.fade,
+                  );
                 } else if (snapshot.hasError) {
                   return Text("error");
                 } else {
