@@ -41,6 +41,7 @@ dev_dependencies:
   audio_video_progress_bar: ^0.10.0
   flutter_dotenv: ^5.0.2
   http: ^0.13.4
+  flutter_native_splash: ^2.2.0
 
 flutter:
 
@@ -53,6 +54,8 @@ flutter:
     - assets/images/
     - assets/config/
     - assets/lottie/
+    - assets/gif/
+
   fonts:
     - family: Pretendard
       fonts:

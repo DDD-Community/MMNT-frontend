@@ -14,7 +14,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/style_constants.dart';
 
 class MapScreen extends StatefulWidget {
@@ -35,7 +34,7 @@ class _MapScreenState extends State<MapScreen> {
   GlobalKey? _keyGoogleMap = GlobalKey();
   bool _isCameraReCenter = false;
   static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(0.347596, 32.582520),
+    target: LatLng(37.532600, 127.024612),
     zoom: 14.4746,
   );
   final Map<String, Marker> _markers = {};
@@ -183,7 +182,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 SizedBox(height: 5.h,),
-                Text('현재 위치', style: fabTextStyle,)
+                Text('현재 위치', style: kFabTextStyle,)
               ],
             ),
           ),
@@ -203,7 +202,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 SizedBox(height: 5.h,),
-                Text('핀 생성', style: fabTextStyle,)
+                Text('핀 생성', style: kFabTextStyle,)
               ],
             ),
           ),
