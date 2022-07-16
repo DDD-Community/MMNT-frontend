@@ -6,9 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'constants/style_constants.dart';
 import 'dongwon_test/test.dart';
 import 'providers/storylist_provider.dart';
+import 'screens/login_screen.dart';
+import 'screens/permission_screen.dart';
 import 'showstory/show_story.dart';
 
 void main() {
@@ -75,8 +77,9 @@ class _MyAppState extends State<MyApp> {
           return MaterialApp(
             title: 'dash_moment',
             debugShowCheckedModeBanner: false,
-            // home: MapScreen(),  // 기존 코드
-            home: ShowStory(_storyList[0].link), // 테스트 홈, 첫 이니셜 링크가 필요
+            // home: LoginScreen(),  // 기존 코드
+            // home: ShowStory(_storyList[0].link), // 테스트 홈, 첫 이니셜 링크가 필요
+
 
             // Dark theme 기반
             theme: ThemeData(
@@ -84,14 +87,30 @@ class _MyAppState extends State<MyApp> {
               brightness: Brightness.dark,
               highlightColor: Colors.yellow,
               floatingActionButtonTheme: const FloatingActionButtonThemeData(
-                backgroundColor: Color(0xFFFD6744),
+                backgroundColor: Color(0xFF1E5EFF),
               ),
               textTheme: TextTheme(
                 // bodyText2가 기본 텍스트 스타일
                 bodyText2:
                     TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
               ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  primary: kElevatedButtonColor
+                )
+              ),
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                  primary: const Color(0xFF707077),
+                  textStyle: TextStyle(fontSize: 15.sp)
+                )
+              ),
             ),
+            initialRoute: '/',
+            routes: {
+              '/' : (context) => const LoginScreen(),
+
+            },
           );
         },
       ),
