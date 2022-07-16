@@ -14,7 +14,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/style_constants.dart';
 
 class MapScreen extends StatefulWidget {
@@ -183,7 +182,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 SizedBox(height: 5.h,),
-                Text('현재 위치', style: fabTextStyle,)
+                Text('현재 위치', style: kFabTextStyle,)
               ],
             ),
           ),
@@ -203,7 +202,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 SizedBox(height: 5.h,),
-                Text('핀 생성', style: fabTextStyle,)
+                Text('핀 생성', style: kFabTextStyle,)
               ],
             ),
           ),
