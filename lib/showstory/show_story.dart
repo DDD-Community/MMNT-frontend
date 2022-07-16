@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dash_mement/poststory/post_image.dart';
 import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
@@ -10,6 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 /* 
 showStory는 유튜브 처음 링크 필요
@@ -39,24 +43,12 @@ class _ShowStory extends State<ShowStory> {
   List<String> _urlList = [];
   late YoutubePlayerController _youtubePlayerController;
 
-  void _postStory(String location, PushStoryProvider provider) {
+  void _postStory(double lat_y, double lng_x, PushStoryProvider provider) {
     _youtubePlayerController.pause();
-    // MultiProvider(providers: [
-    //   ChangeNotifierProvider(
-    //     create: (_) => PushStoryProvider(location),
-    //   )
-    // ], child: PostImage(_backFromChild));
-    provider.location = location;
+    provider.latitude_y = lat_y;
+    provider.longitude_x = lng_x;
     Navigator.push(
         context, MaterialPageRoute(builder: (_) => PostImage(_backFromChild)));
-    // Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //         builder: (_) => MultiProvider(providers: [
-    //               ChangeNotifierProvider(
-    //                 create: (_) => PushStoryProvider(location),
-    //               )
-    //             ], child: PostImage(_backFromChild))));
   }
 
   void _backButton() {}
@@ -64,6 +56,21 @@ class _ShowStory extends State<ShowStory> {
   //youtube 재생 기능(차일드가 꺼지면...)
   void _backFromChild() {
     _youtubePlayerController.play();
+  }
+
+  Future<String> _getAddress(double lat, double lng) async {
+    String? API_KEY = dotenv.env["TMAP_KEY"];
+    final url_main = Uri.parse(
+        "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A03&newAddressExtend=Y");
+    final url_building = Uri.parse(
+        "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A04&newAddressExtend=Y");
+    final response_main = await http.get(url_main,
+        headers: {"Accept": "aplication/json", "appKey": API_KEY!});
+    final response_building = await http.get(url_building,
+        headers: {"Accept": "aplication/json", "appKey": API_KEY});
+
+    // 도로명 + 건물 번호
+    return "${jsonDecode(response_main.body)["addressInfo"]['fullAddress']} ${jsonDecode(response_building.body)["addressInfo"]["buildingIndex"]}";
   }
 
   @override
@@ -96,6 +103,9 @@ class _ShowStory extends State<ShowStory> {
     _storyList = Provider.of<StoryListProvider>(context);
     _pushStory = Provider.of<PushStoryProvider>(context);
 
+    double lat_y = _storyList.getStoryAt(0).latitude_y;
+    double lng_x = _storyList.getStoryAt(0).longitude_x;
+
     //storywidget 생성 / urlList 생성
     _storyWidgetList = [];
     for (int i = 0; i < _storyList.getLength(); i++) {
@@ -107,8 +117,6 @@ class _ShowStory extends State<ShowStory> {
 
     _percent = _currentValue / _storyList.getLength();
 
-    String _location = _storyList.getStoryAt(0).location;
-
     return Scaffold(
       backgroundColor: MmntStyle().mainBlack,
       appBar: AppBar(
@@ -119,8 +127,21 @@ class _ShowStory extends State<ShowStory> {
           ),
           backgroundColor: MmntStyle().mainBlack,
           shadowColor: Colors.transparent,
-          title: Text("${_location} #${_currentValue}",
-              style: StoryTextStyle().appBarWhite)),
+          title: FutureBuilder(
+              future: _getAddress(lat_y, lng_x),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(
+                    "${snapshot.data.toString()} #${_currentValue}",
+                    style: StoryTextStyle().appBarWhite,
+                    overflow: TextOverflow.fade,
+                  );
+                } else if (snapshot.hasError) {
+                  return Text("error");
+                } else {
+                  return Text("로딩중...");
+                }
+              })),
       body: YoutubePlayerBuilder(
         player: YoutubePlayer(
           controller: _youtubePlayerController,
@@ -147,7 +168,8 @@ class _ShowStory extends State<ShowStory> {
                 height: MediaQuery.of(context).size.height *
                     0.92, // carousel height
                 enableInfiniteScroll: false, // 무한 스크롤
-                autoPlay: false, // 자동 넘김
+                autoPlay: true, // 자동 넘김
+                autoPlayInterval: const Duration(minutes: 1),
                 viewportFraction: 0.9), // viewport
           ),
           // linear indicator
@@ -163,7 +185,7 @@ class _ShowStory extends State<ShowStory> {
         ])),
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () => _postStory(_location, _pushStory),
+          onPressed: () => _postStory(lat_y, lng_x, _pushStory),
           backgroundColor: MmntStyle().primary,
           child: Icon(
             Icons.add,

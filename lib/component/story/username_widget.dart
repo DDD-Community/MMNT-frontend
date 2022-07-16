@@ -10,6 +10,6 @@ class UserNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(_userName, style: StoryTextStyle().basicInfo);
+    return Text(_userName, style: StoryTextStyle().user);
   }
 }

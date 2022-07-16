@@ -35,10 +35,10 @@ class _CheckImage extends State<CheckImage> {
   }
 
   _showToast() {
-    Widget toast = MnmtToast(message: "사진 불러오기 성공!", width: 160, radius: 20);
+    Widget toast = MnmtToast(message: "사진 불러오기 성공!", width: 180);
     _ftoast.showToast(
         child: toast,
-        toastDuration: Duration(seconds: 3),
+        toastDuration: Duration(milliseconds: 1500),
         positionedToastBuilder: (context, child) =>
             Positioned(bottom: 80, left: 0.0, right: 0.0, child: child));
   }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class MnmtToast extends StatelessWidget {
+class MnmtErrorToast extends StatelessWidget {
   late String _message;
   late double _width;
 
-  MnmtToast({required String message, required double width}) {
+  MnmtErrorToast({required String message, required double width}) {
     this._message = message;
     this._width = width;
   }
@@ -24,8 +24,11 @@ class MnmtToast extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Image.asset("assets/images/good_status.png",
-                    width: 20, height: 20),
+                Image.asset(
+                  "assets/images/error_status.png",
+                  width: 20,
+                  height: 20,
+                ),
                 Text(_message,
                     style: TextStyle(
                         fontSize: 14,

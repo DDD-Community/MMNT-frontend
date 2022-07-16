@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 Singleton임
 */
 class StoryTextStyle {
-  late TextStyle _basic_info;
+  late TextStyle _dateTime;
+  late TextStyle _user;
   late TextStyle _title;
   late TextStyle _message;
   late TextStyle _trackName;
@@ -23,12 +24,21 @@ class StoryTextStyle {
   factory StoryTextStyle() => _instance;
 
   StoryTextStyle._internal() {
-    _basic_info = TextStyle(
+    _dateTime = TextStyle(
         fontFamily: "Pretendard",
         letterSpacing: -0.1,
         color: MmntStyle().mainWhite,
         fontWeight: FontWeight.w500,
-        fontSize: 11,
+        fontSize: 12,
+        height: 1.2 // 수정 필요
+        );
+
+    _user = TextStyle(
+        fontFamily: "Pretendard",
+        letterSpacing: -0.1,
+        color: MmntStyle().mainWhite,
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
         height: 1.2 // 수정 필요
         );
     _title = TextStyle(
@@ -46,13 +56,13 @@ class StoryTextStyle {
       height: 1.6, // 수정 필요
     );
     _trackName = TextStyle(
-        fontSize: 20,
+        fontSize: 16,
         fontFamily: 'Pretendard',
         fontWeight: FontWeight.w600,
         letterSpacing: -0.41,
         color: MmntStyle().mainWhite);
     _artist = TextStyle(
-        fontSize: 11,
+        fontSize: 12,
         fontFamily: 'Pretendard',
         fontWeight: FontWeight.w400,
         letterSpacing: -0.43,
@@ -73,17 +83,18 @@ class StoryTextStyle {
         fontSize: 17,
         fontFamily: 'Pretendard',
         letterSpacing: -0.41,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w600,
         color: MmntStyle().mainBlack);
     _buttonWhite = TextStyle(
         fontSize: 17,
         fontFamily: 'Pretendard',
         letterSpacing: -0.41,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w600,
         color: MmntStyle().mainWhite);
   }
 
-  get basicInfo => _basic_info;
+  get dateTime => _dateTime;
+  get user => _user;
   get title => _title;
   get message => _message;
   get trackName => _trackName;
