@@ -171,10 +171,12 @@ class _MapScreenState extends State<MapScreen> {
                   height: 56.h,
                   width: 56.w,
                   child: FloatingActionButton(
-                    backgroundColor: const Color(0xFF111111),
+                    heroTag: "current_location",
+                    backgroundColor: const Color(0xFFD9D9D9),
                     foregroundColor: Colors.white,
                     child: const Icon(
                       Icons.gps_fixed,
+                      color: Colors.black,
                     ),
                     onPressed: () {
                       getCurrentPosition();
@@ -195,8 +197,10 @@ class _MapScreenState extends State<MapScreen> {
                   height: 56.h,
                   width: 56.w,
                   child: FloatingActionButton(
+                    heroTag: "create_pin",
                     child: SvgPicture.asset(
                       'assets/svgs/pin.svg',
+                      color: Colors.white,
                     ),
                     onPressed: () {},
                   ),
