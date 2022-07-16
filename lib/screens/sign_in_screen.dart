@@ -1,3 +1,4 @@
+import 'package:dash_mement/constants/style_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
@@ -60,8 +61,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     Text(
                       '이메일',
                       style: TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ],
@@ -71,6 +72,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   controller: emailController,
                   decoration: InputDecoration(
                     hintText: '이메일 주소를 입력해 주세요',
+                    hintStyle: kGray14.copyWith(fontWeight: FontWeight.w500,),
                   ),
                 ),
 
@@ -81,8 +83,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     Text(
                       '비밀번호',
                       style: TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ],
@@ -90,7 +92,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 TextFormField(
                   controller: passwordController,
                   decoration: InputDecoration(
-                      hintText: '비밀번호 (영문+숫자+특수문자 10자 이상)'
+                      hintText: '비밀번호 (영문+숫자+특수문자 10자 이상)',
+                      hintStyle: kGray14.copyWith(fontWeight: FontWeight.w500,)
                   ),
 
                 ),
