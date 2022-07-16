@@ -1,6 +1,7 @@
 import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
+import 'package:dash_mement/screens/map_example.dart';
 import 'package:dash_mement/screens/map_screen.dart';
 import 'package:dash_mement/screens/sign_in_screen.dart';
 import 'package:dash_mement/screens/sign_up_screen.dart';
@@ -111,7 +112,7 @@ class _MyAppState extends State<MyApp> {
                           titleTextStyle: kGrayBold18,
                           color: Colors.black,
                           iconTheme: IconThemeData(
-                            color: Color(0xffbD9D9D9),
+                            color: kAppbarIconColor,
                           )),
                       floatingActionButtonTheme:
                           const FloatingActionButtonThemeData(
@@ -140,6 +141,7 @@ class _MyAppState extends State<MyApp> {
                     '/sign-up-screen': (context) => const SignUpScreen(),
                     '/sign-in-screen': (context) => const SignInScreen(),
                     '/map-screen': (context) => MapScreen(),
+                    '/map-example': (context) => MapExample(),
                   },
                 );
               },
@@ -149,69 +151,6 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  //   List<Story> _storyList = _makeStoryTest();
-
-  //   return MultiProvider(
-  //     providers: [
-  //       ListenableProvider(create: (_) => MapProvider()),
-  //       ChangeNotifierProvider(create: (_) => StoryListProvider(_storyList)),
-  //       ChangeNotifierProvider(create: (_) => PushStoryProvider())
-  //     ],
-  //     child: FutureBuilder(
-  //       future: Init.instance.initialize(),
-  //       builder: (BuildContext context, AsyncSnapshot snapshot) {
-  //         if (snapshot.connectionState == ConnectionState.waiting) {
-  //           return MaterialApp(
-  //             home: Splash(),
-  //           );
-  //         } else {
-  //           return ScreenUtilInit(
-  //             designSize: const Size(375, 812),
-  //             builder: (BuildContext context, Widget? child) {
-  //               return MaterialApp(
-  //                 title: 'dash_moment',
-  //                 debugShowCheckedModeBanner: false,
-  //                 // home: LoginScreen(),  // 기존 코드
-  //                 // home: ShowStory(_storyList[0].link), // 테스트 홈, 첫 이니셜 링크가 필요
-
-  //                 // Dark theme 기반
-  //                 theme: ThemeData(
-  //                   fontFamily: 'Pretendard',
-  //                   brightness: Brightness.dark,
-  //                   highlightColor: Colors.yellow,
-  //                   floatingActionButtonTheme:
-  //                       const FloatingActionButtonThemeData(
-  //                     backgroundColor: Color(0xFF1E5EFF),
-  //                   ),
-  //                   textTheme: TextTheme(
-  //                     // bodyText2가 기본 텍스트 스타일
-  //                     bodyText2: TextStyle(
-  //                         fontSize: 16.sp, fontWeight: FontWeight.w700),
-  //                   ),
-  //                   elevatedButtonTheme: ElevatedButtonThemeData(
-  //                       style: ElevatedButton.styleFrom(
-  //                           primary: kElevatedButtonColor)),
-  //                   textButtonTheme: TextButtonThemeData(
-  //                       style: TextButton.styleFrom(
-  //                           primary: const Color(0xFF707077),
-  //                           textStyle: TextStyle(fontSize: 15.sp))),
-  //                 ),
-  //                 initialRoute: '/',
-  //                 routes: {
-  //                   //'/': (context) => const LoginScreen(),
-  //                   '/': (context) => ShowStory(_storyList[0].link),
-  //                 },
-  //               );
-  //             },
-  //           );
-  //         }
-  //       },
-  //     ),
-  //   );
-  // }
 }
 
 class Init {
