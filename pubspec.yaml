@@ -48,6 +48,7 @@ flutter:
     - assets/json/
     - assets/test/
     - assets/images/
+    - assets/gif/
 
   fonts:
     - family: Pretendard
