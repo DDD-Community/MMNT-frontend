@@ -24,6 +24,7 @@ class TrackInfoWidget extends StatelessWidget {
                 _trackName,
                 style: StoryTextStyle().trackName,
               )),
+          Container(height: 4, width: 4),
           AnimatedOverflow(
               maxWidth: _limitWidth,
               animatedOverflowDirection: AnimatedOverflowDirection.HORIZONTAL,
@@ -37,13 +38,13 @@ class TrackInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        width: MediaQuery.of(context).size.width * 0.64,
+        width: MediaQuery.of(context).size.width * 0.76,
         height: 78,
         decoration: BoxDecoration(
             color: MmntStyle().secondBlack,
             borderRadius: BorderRadius.circular(8)),
         child: Padding(
-            padding: EdgeInsets.only(left: 8, right: 8),
+            padding: EdgeInsets.only(left: 22, right: 22),
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,

@@ -77,15 +77,15 @@ class _InputColumn extends State<InputColumn> {
   }
 
   void _showTitleToast() {
-    Widget toast = MnmtErrorToast(
-        message: "제목은 16글자까지 작성할 수 있습니다.", width: 240, radius: 20);
+    Widget toast =
+        MnmtErrorToast(message: "제목은 16글자까지 작성할 수 있습니다.", width: 240);
     final viewInsets = EdgeInsets.fromWindowPadding(
         WidgetsBinding.instance.window.viewInsets,
         WidgetsBinding.instance.window.devicePixelRatio);
     _ftoast.showToast(
         child: toast,
         gravity: ToastGravity.TOP,
-        toastDuration: Duration(seconds: 3),
+        toastDuration: Duration(milliseconds: 2000),
         positionedToastBuilder: (context, child) => Positioned(
             bottom: viewInsets.bottom + 12,
             left: 0.0,
@@ -94,15 +94,15 @@ class _InputColumn extends State<InputColumn> {
   }
 
   void _showContextToast() {
-    Widget toast = MnmtErrorToast(
-        message: "본문은 80글자까지 작성할 수 있습니다.", width: 240, radius: 20);
+    Widget toast =
+        MnmtErrorToast(message: "본문은 80글자까지 작성할 수 있습니다.", width: 260);
     final viewInsets = EdgeInsets.fromWindowPadding(
         WidgetsBinding.instance.window.viewInsets,
         WidgetsBinding.instance.window.devicePixelRatio);
     _ftoast.showToast(
         child: toast,
         gravity: ToastGravity.TOP,
-        toastDuration: Duration(seconds: 3),
+        toastDuration: Duration(milliseconds: 2000),
         positionedToastBuilder: (context, child) => Positioned(
             bottom: viewInsets.bottom + 12,
             left: 0.0,
@@ -119,7 +119,8 @@ class _InputColumn extends State<InputColumn> {
       Column(children: [
         Column(children: [
           Padding(
-              padding: EdgeInsets.only(bottom: 4, top: 32), child: _dateWidget),
+              padding: EdgeInsets.only(bottom: 12, top: 28),
+              child: _dateWidget),
           _userNameWidget
         ]),
         Container(height: MediaQuery.of(context).size.height * 0.18), //spacer
@@ -178,7 +179,9 @@ class _InputColumn extends State<InputColumn> {
                   decoration: InputDecoration(
                       fillColor: Color(0xBD000000),
                       filled: true,
-                      enabledBorder: InputBorder.none,
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4),
+                          borderSide: BorderSide.none),
                       focusedBorder: InputBorder.none,
                       border: InputBorder.none,
                       errorBorder: InputBorder.none,

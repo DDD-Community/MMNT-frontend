@@ -24,7 +24,7 @@ class StoryColumn extends StatelessWidget {
     return Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Column(children: [
         Padding(
-            padding: EdgeInsets.only(bottom: 4, top: 32), child: _dateWidget),
+            padding: EdgeInsets.only(bottom: 12, top: 28), child: _dateWidget),
         _userNameWidget
       ]),
       _storyText,

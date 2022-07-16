@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/component/toast/mmnt_toast.dart';
 import 'package:dash_mement/component/toast/mmnterror_toast.dart';
+import 'package:dash_mement/poststory/check_all.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
@@ -12,6 +13,8 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:lottie/lottie.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart'
     as LocalProgressBar;
 
@@ -58,6 +61,9 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
     _linkEditController = TextEditingController();
     _trackNameController = TextEditingController();
     _artistController = TextEditingController();
+    _playerController = YoutubePlayerController(
+        initialVideoId:
+            YoutubePlayer.convertUrlToId("wwww.youtube.com/") ?? "");
     _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200))
       ..addListener(() {
@@ -90,47 +96,39 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
   }
 
   void _backButton(BuildContext context) {
+    _pushStory.title = "";
+    _pushStory.context = "";
+
     Navigator.of(context).pop();
   }
 
   void _submit(BuildContext context, PushStoryProvider pushStory) {
-    if (_pushStory.title == "" || _pushStory.context == "") {
+    if ((_pushStory.title == "" || _pushStory.context == "")) {
       _ftoast = FToast();
       _ftoast.init(context);
-      _showToast();
+      _showErrorToast("제목과 본문 모두 작성해주세요", 240);
       return;
+    } else {
+      _pushStory.path = this.widget._imageFile; // 파일 설정
+
+      print(_pushStory.dateTime);
+      print(_pushStory.path.toString());
+      print(_pushStory.title);
+      print(_pushStory.context);
+      FocusScope.of(context).unfocus(); // 키보드 내리기
+      _panelController.open();
     }
-    _pushStory.path = this.widget._imageFile; // 파일 설정
-
-    print(_pushStory.dateTime);
-    print(_pushStory.path.toString());
-    print(_pushStory.location);
-    print(_pushStory.title);
-    print(_pushStory.context);
-    FocusScope.of(context).unfocus(); // 키보드 내리기
-    _panelController.open();
-
-    // _pushStory.path = this.widget._imageFile; // 파일 설정
-
-    // print(_pushStory.dateTime);
-    // print(_pushStory.path.toString());
-    // print(_pushStory.location);
-    // print(_pushStory.title);
-    // print(_pushStory.context);
-    // FocusScope.of(context).unfocus(); // 키보드 내리기
-    // _panelController.open();
   }
 
-  void _showToast() {
-    Widget toast =
-        MnmtErrorToast(message: "제목과 본문을 작성해주세요.", width: 220, radius: 8);
+  void _showErrorToast(String text, double width) {
+    Widget toast = MnmtErrorToast(message: text, width: width);
     final viewInsets = EdgeInsets.fromWindowPadding(
         WidgetsBinding.instance.window.viewInsets,
         WidgetsBinding.instance.window.devicePixelRatio);
     _ftoast.showToast(
         child: toast,
         gravity: ToastGravity.TOP,
-        toastDuration: Duration(seconds: 3),
+        toastDuration: Duration(milliseconds: 1500),
         positionedToastBuilder: (context, child) => Positioned(
             bottom: viewInsets.bottom + 12,
             left: 0.0,
@@ -162,6 +160,7 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
     if (id != null) {
       FocusScope.of(context).unfocus();
       setState(() {
+        _pushStory.link = text;
         _youtubeId = id;
         _playerController = YoutubePlayerController(
             initialVideoId: _youtubeId,
@@ -177,7 +176,19 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
     }
   }
 
-  void _postAll() async {}
+  void _postAll() {
+    if ((_trackNameController.text == null && _artistController.text == null) ||
+        (_trackNameController.text == "" && _artistController.text == "")) {
+      _ftoast = FToast();
+      _ftoast.init(context);
+      _showErrorToast("제목과 아티스트명을 모두 작성해주세요", 290);
+    } else {
+      _pushStory.track = _trackNameController.text;
+      _pushStory.artist = _artistController.text;
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => CheckAll(_youtubeId)));
+    }
+  }
 
   Stream<DurationState> _getDuration() {
     Stream<DurationState> stream =
@@ -220,6 +231,7 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
           controller: _panelController,
           backdropEnabled: true,
           minHeight: 0,
+          maxHeight: _inputInfo ? 420 : 380,
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(12), topRight: Radius.circular(12)),
           panel: Container(
@@ -261,33 +273,18 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
                                   color: Color(0x44747474), thickness: 1.0)),
                           Padding(
                               padding: EdgeInsets.only(left: 20, top: 12),
-                              child: Text("유튜브에서 원하는 음악의 링크를 복사 후 붙여넣으면",
+                              child: Text("유튜브에서 원하는 음악의 링크를",
                                   style: TextStyle(
-                                      fontFamily: 'Pretendard',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      letterSpacing: -0.41,
-                                      height: 1.2,
-                                      color: Color(0xCCFFFFFF)))),
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400))),
                           Padding(
                               padding: EdgeInsets.only(left: 20),
-                              child: RichText(
-                                  text: TextSpan(
-                                      style: TextStyle(
-                                          fontFamily: 'Pretendard',
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
-                                          letterSpacing: -0.41,
-                                          height: 1.2,
-                                          color: Color(0xCCFFFFFF)),
-                                      children: [
-                                    TextSpan(
-                                        text: "00:00 ~ 1:00",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                        )),
-                                    TextSpan(text: " 구간이 스토리에 삽입됩니다.")
-                                  ]))),
+                              child: Text("복사 후 붙여넣기 해주세요",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w400))),
                           Container(
                               width: _widgetWidth,
                               padding: EdgeInsets.only(left: 20, top: 24),
@@ -298,18 +295,39 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
                                 decoration: InputDecoration(
                                     fillColor: Color(0xFF262626),
                                     hintText: "이곳에 링크 주소를 입력해주세요",
+                                    contentPadding: EdgeInsets.all(20),
                                     filled: true,
-                                    suffixIcon: Icon(
-                                      Icons.check_circle,
-                                      color: _animation.value,
-                                    ),
+                                    suffixIcon: Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(4, 12, 20, 12),
+                                        child: _youtubeCheck
+                                            ? Container(
+                                                height: 4,
+                                                width: 4,
+                                                child: Lottie.asset(
+                                                    "assets/lottie/check_animation.zip",
+                                                    repeat: false,
+                                                    height: 4,
+                                                    width: 4,
+                                                    fit: BoxFit.fill))
+                                            : Container(width: 1)),
                                     border: OutlineInputBorder(
                                         borderSide: BorderSide.none,
                                         borderRadius:
                                             BorderRadius.circular(4))),
                               )),
                           !_youtubeCheck
-                              ? Container()
+                              ? Container(
+                                  margin: EdgeInsets.only(
+                                      left: 20, top: 12, bottom: 16),
+                                  child: Text(
+                                    "음악의 00:00~01:00 구간이 삽입됩니다",
+                                    style: TextStyle(
+                                        color: Color(0xFF5894FC),
+                                        fontSize: 13,
+                                        fontFamily: "Pretendard",
+                                        fontWeight: FontWeight.w400),
+                                  ))
                               : YoutubePlayerBuilder(
                                   player: YoutubePlayer(
                                     width: 10,
@@ -351,14 +369,14 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
                                                       .ProgressBar(
                                                           progress: progress,
                                                           buffered: buffered,
+                                                          barHeight: 4,
+                                                          thumbRadius: 6,
                                                           total: const Duration(
                                                               minutes: 1),
                                                           progressBarColor:
-                                                              MmntStyle()
-                                                                  .primary,
+                                                              Color(0xFF5894FC),
                                                           thumbColor:
-                                                              MmntStyle()
-                                                                  .primary,
+                                                              Color(0xFF5894FC),
                                                           baseBarColor: Colors
                                                               .white
                                                               .withOpacity(
@@ -461,7 +479,7 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
                                           borderRadius:
                                               BorderRadius.circular(4))))),
                           Padding(
-                              padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
+                              padding: EdgeInsets.fromLTRB(10, 40, 10, 0),
                               child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                       fixedSize:

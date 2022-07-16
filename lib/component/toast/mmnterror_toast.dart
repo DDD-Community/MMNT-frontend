@@ -3,15 +3,10 @@ import 'package:flutter/material.dart';
 class MnmtErrorToast extends StatelessWidget {
   late String _message;
   late double _width;
-  late double _radius;
 
-  MnmtErrorToast(
-      {required String message,
-      required double width,
-      required double radius}) {
+  MnmtErrorToast({required String message, required double width}) {
     this._message = message;
     this._width = width;
-    this._radius = radius;
   }
 
   @override
@@ -20,16 +15,19 @@ class MnmtErrorToast extends StatelessWidget {
         width: _width,
         decoration: BoxDecoration(
             color: Color(0xFF262626),
-            borderRadius: BorderRadius.circular(_radius)),
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: [
+              BoxShadow(blurRadius: 50, color: Colors.black.withOpacity(0.4))
+            ]),
         child: Padding(
-            padding: EdgeInsets.all(8),
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Icon(
-                  Icons.error,
-                  color: Color(0xFFFD6744),
-                  size: 20,
+                Image.asset(
+                  "assets/images/error_status.png",
+                  width: 20,
+                  height: 20,
                 ),
                 Text(_message,
                     style: TextStyle(

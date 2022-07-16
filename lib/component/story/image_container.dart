@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
  File: 이미지 파일 삽입인 경우
  Basic: 
 */
-enum StoryType { Story, Input, File, Basic }
+enum StoryType { Story, Input, File, Basic, Check }
 
 class ImageContainer extends StatelessWidget {
   late double _height;
@@ -59,11 +59,20 @@ class ImageContainer extends StatelessWidget {
     _childInput = _getInputColumn();
   }
 
+  ImageContainer.check(Size size, this._imageFile, Story story) {
+    _storyType = StoryType.Check;
+    _height = size.height;
+    _width = size.width;
+    _story = story;
+    _childStory = _getChild();
+  }
+
   ImageProvider<Object> _getCurrentImage() {
     if (_storyType == StoryType.Story) {
       return AssetImage(_story!.img);
     } else if ((_storyType == StoryType.File) ||
-        (_storyType == StoryType.Input)) {
+        (_storyType == StoryType.Input) ||
+        (_storyType == StoryType.Check)) {
       return FileImage(_imageFile!);
     } else {
       return AssetImage(_imagePath!);
@@ -77,6 +86,8 @@ class ImageContainer extends StatelessWidget {
       return Container();
     } else if (_storyType == StoryType.Input) {
       return InputColumn();
+    } else if (_storyType == StoryType.Check) {
+      return StoryColumn(_story!);
     } else {
       return StoryColumn(_story!);
     }

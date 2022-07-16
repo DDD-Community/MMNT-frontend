@@ -1,16 +1,25 @@
 import 'dart:io';
 import 'package:dash_mement/poststory/check_image.dart';
+import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class PostImage extends StatelessWidget {
-  Widget _inform = Container();
+  Widget _inform = Image.asset("assets/images/check_image.png");
   final ImagePicker _picker = ImagePicker();
   late Function _backButton;
+  double? lat_y;
+  double? lng_x;
 
   PostImage(this._backButton) {}
+
+  PostImage.newPin({required double latitude_y, required double longitude_x}) {
+    lat_y = latitude_y;
+    lng_x = longitude_x;
+  }
 
   void _getImage(BuildContext context) async {
     // Pick an image
@@ -39,7 +48,13 @@ class PostImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size _buttonSize = Size(MediaQuery.of(context).size.width * 0.9,
-        MediaQuery.of(context).size.height * 0.06);
+        MediaQuery.of(context).size.height * 0.075);
+    if (lat_y != null && lng_x != null) {
+      PushStoryProvider pushStory = Provider.of<PushStoryProvider>(context);
+      pushStory.latitude_y = lat_y!;
+      pushStory.longitude_x = lng_x!;
+    }
+
     return Scaffold(
         backgroundColor: MmntStyle().mainBlack,
         appBar: AppBar(
@@ -67,7 +82,7 @@ class PostImage extends StatelessWidget {
                     fixedSize: _buttonSize,
                     primary: MmntStyle().primary,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8))),
+                        borderRadius: BorderRadius.circular(4))),
                 child: Text(
                   "갤러리에서 사진 불러오기",
                   style: StoryTextStyle().buttonWhite,
@@ -81,8 +96,8 @@ class PostImage extends StatelessWidget {
                     fixedSize: _buttonSize,
                     primary: MmntStyle().primaryDisable,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8))),
-                child: Text("새로운 사진 촬영하기", style: StoryTextStyle().buttonBlack),
+                        borderRadius: BorderRadius.circular(4))),
+                child: Text("새로운 사진 촬영하기", style: StoryTextStyle().buttonWhite),
                 onPressed: () => _pickImage(context),
               ))
         ]));

@@ -11,7 +11,8 @@ class PushStoryProvider extends ChangeNotifier {
   String _message = "";
   late String _trackName;
   late String _artist;
-  late String _location;
+  late double _lat_y;
+  late double _lng_x;
 
   PushStoryProvider() {}
 
@@ -23,7 +24,8 @@ class PushStoryProvider extends ChangeNotifier {
   String get context => _message;
   String get track => _trackName;
   String get artist => _artist;
-  String get location => _location;
+  double get latitude_y => _lat_y;
+  double get longitude_x => _lng_x;
 
   set title(String value) {
     _title = value;
@@ -65,8 +67,13 @@ class PushStoryProvider extends ChangeNotifier {
     ChangeNotifier();
   }
 
-  set location(String value) {
-    _location = value;
+  set latitude_y(double value) {
+    _lat_y = value;
+    ChangeNotifier();
+  }
+
+  set longitude_x(double value) {
+    _lng_x = value;
     ChangeNotifier();
   }
 }
