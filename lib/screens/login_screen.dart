@@ -6,16 +6,16 @@ import '../constants/style_constants.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
-  static const id = '/';
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  static const id = '/';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 50.w),
         child: Column(
@@ -50,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text('이메일 주소로 로그인'),
                     onPressed: () {
                       HapticFeedback.mediumImpact();
+                      Navigator.pushNamed(context, '/sign-in-screen');
                     }, )),
             SizedBox(
               height: 10.h,
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Text('회원가입'),
                         onPressed: () {
                           HapticFeedback.mediumImpact();
-
+                          Navigator.pushNamed(context, '/sign-up-screen');
                       }, ),
                       Container(
                         width: 2,
@@ -75,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextButton(onPressed: () {
                         HapticFeedback.mediumImpact();
-                      }, child: const Text('로그인'))
+                      }, child: const Text('로그인문의'))
                     ],
                   ),
                 )),

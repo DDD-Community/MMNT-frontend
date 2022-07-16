@@ -2,6 +2,8 @@ import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/screens/map_screen.dart';
+import 'package:dash_mement/screens/sign_in_screen.dart';
+import 'package:dash_mement/screens/sign_up_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,6 +16,7 @@ import 'screens/login_screen.dart';
 import 'screens/permission_screen.dart';
 import 'screens/splash.dart';
 import 'showstory/show_story.dart';
+import 'package:dio/dio.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -80,6 +83,7 @@ class _MyAppState extends State<MyApp> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return MaterialApp(
+              debugShowCheckedModeBanner: false,
               home: Splash(),
             );
           } else {
@@ -97,9 +101,19 @@ class _MyAppState extends State<MyApp> {
                     fontFamily: 'Pretendard',
                     brightness: Brightness.dark,
                     highlightColor: Colors.yellow,
+                    scaffoldBackgroundColor: Colors.black,
+                    appBarTheme: AppBarTheme(
+                      centerTitle: true,
+                      titleTextStyle: kGrayBold18,
+                      color: Colors.black,
+                      iconTheme: IconThemeData(
+                        color: Color(0xffbD9D9D9),
+                      )
+                    ),
                     floatingActionButtonTheme:
                         const FloatingActionButtonThemeData(
                       backgroundColor: Color(0xFF1E5EFF),
+
                     ),
                     textTheme: TextTheme(
                       // bodyText2가 기본 텍스트 스타일
@@ -117,6 +131,9 @@ class _MyAppState extends State<MyApp> {
                   initialRoute: '/',
                   routes: {
                     '/': (context) => const LoginScreen(),
+                    '/sign-up-screen': (context) => const SignUpScreen(),
+                    '/sign-in-screen': (context) => const SignInScreen(),
+                    '/map-screen': (context) => MapScreen(),
                   },
                 );
               },
@@ -137,6 +154,5 @@ class Init {
     await Future.delayed(
       kDebugMode ? const Duration(seconds: 0) : const Duration(seconds: 4)
     );
-
   }
 }
