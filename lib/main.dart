@@ -140,6 +140,6 @@ class Init {
   Future initialize() async {
     // This is where you can initialize the resources needed by your app while
     await Future.delayed(
-        kDebugMode ? const Duration(seconds: 0) : const Duration(seconds: 4));
+        kDebugMode ? const Duration(seconds: 4) : const Duration(seconds: 4));
   }
 }
