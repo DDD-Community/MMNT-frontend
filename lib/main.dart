@@ -1,7 +1,6 @@
 import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
-import 'package:dash_mement/screens/map_example.dart';
 import 'package:dash_mement/screens/map_screen.dart';
 import 'package:dash_mement/screens/sign_in_screen.dart';
 import 'package:dash_mement/screens/sign_up_screen.dart';
@@ -135,13 +134,13 @@ class _MyAppState extends State<MyApp> {
                               borderSide: BorderSide(
                                   color: kTextFormFieldUnderlineColor,
                                   width: 1.5)))),
-                  initialRoute: '/map-screen',
+                  initialRoute: '/',
                   routes: {
                     '/': (context) => const LoginScreen(),
                     '/sign-up-screen': (context) => const SignUpScreen(),
                     '/sign-in-screen': (context) => const SignInScreen(),
                     '/map-screen': (context) => MapScreen(),
-                    '/map-example': (context) => MapExample(),
+
                   },
                 );
               },
