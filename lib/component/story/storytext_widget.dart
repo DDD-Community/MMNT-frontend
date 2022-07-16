@@ -23,7 +23,9 @@ class StoryText extends StatelessWidget {
                     textAlign: TextAlign.center,
                   )),
               Container(
-                  decoration: BoxDecoration(color: Color(0x99000000)),
+                  decoration: BoxDecoration(
+                      color: Color(0x99000000),
+                      borderRadius: BorderRadius.circular(4)),
                   child: Padding(
                       padding: EdgeInsets.all(20),
                       child: Text(

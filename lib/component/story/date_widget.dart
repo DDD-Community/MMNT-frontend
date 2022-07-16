@@ -23,8 +23,8 @@ class DateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         child: Column(children: [
-      Text(_date, style: StoryTextStyle().basicInfo),
-      Text(_time, style: StoryTextStyle().basicInfo)
+      Text(_date, style: StoryTextStyle().dateTime),
+      Text(_time, style: StoryTextStyle().dateTime)
     ]));
   }
 }
