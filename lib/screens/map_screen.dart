@@ -14,7 +14,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/style_constants.dart';
 
 class MapScreen extends StatefulWidget {
@@ -35,7 +34,7 @@ class _MapScreenState extends State<MapScreen> {
   GlobalKey? _keyGoogleMap = GlobalKey();
   bool _isCameraReCenter = false;
   static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(0.347596, 32.582520),
+    target: LatLng(37.532600, 127.024612),
     zoom: 14.4746,
   );
   final Map<String, Marker> _markers = {};
@@ -112,7 +111,7 @@ class _MapScreenState extends State<MapScreen> {
 
                     ),
                     Container(
-                      height: 80,
+                      height: 80.h,
                       decoration: BoxDecoration(
                           gradient: LinearGradient(
                               begin: Alignment.topCenter,
@@ -127,7 +126,7 @@ class _MapScreenState extends State<MapScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
+                        children: [
                           Opacity(opacity: 0, child: Padding(
                             padding: EdgeInsets.only(right: 20.0),
                             child: CircleAvatar(),
@@ -135,7 +134,7 @@ class _MapScreenState extends State<MapScreen> {
                           Text('서울특별시 강남구 선릉로551',),
                           Padding(
                             padding: EdgeInsets.only(right: 20.0),
-                            child: SizedBox(height: 33, width: 33, child: CircleAvatar(foregroundColor: Colors.white, backgroundColor: Colors.black, child: Icon(Icons.person),)),
+                            child: SizedBox(height: 35.h, width: 35.w, child: CircleAvatar(foregroundColor: Colors.white, backgroundColor: Colors.black, child: Icon(Icons.person),)),
                           )
                         ],
                       ),
@@ -145,17 +144,17 @@ class _MapScreenState extends State<MapScreen> {
             panel: Column(
               children: [
                 SizedBox(
-                  height: 12.0,
+                  height: 12.h,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Container(
-                      width: 34,
-                      height: 4,
+                      height: 4.h,
+                      width: 34.w,
                       decoration: BoxDecoration(
                           color: Colors.grey[300],
-                          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+                          borderRadius: const BorderRadius.all(Radius.circular(12.0))),
                     ),
                   ],
                 ),
@@ -172,38 +171,42 @@ class _MapScreenState extends State<MapScreen> {
                   height: 56.h,
                   width: 56.w,
                   child: FloatingActionButton(
-                    backgroundColor: const Color(0xFF111111),
+                    heroTag: "current_location",
+                    backgroundColor: const Color(0xFFD9D9D9),
                     foregroundColor: Colors.white,
                     child: const Icon(
                       Icons.gps_fixed,
+                      color: Colors.black,
                     ),
                     onPressed: () {
                       getCurrentPosition();
                     },
                   ),
                 ),
-                const SizedBox(height: 5,),
-                Text('현재 위치', style: fabTextStyle,)
+                SizedBox(height: 5.h,),
+                Text('현재 위치', style: kFabTextStyle,)
               ],
             ),
           ),
           Positioned(
             right: 20.0,
-            bottom: _fabHeight + 75,
+            bottom: _fabHeight + 80.h,
             child: Column(
               children: [
                 SizedBox(
                   height: 56.h,
                   width: 56.w,
                   child: FloatingActionButton(
+                    heroTag: "create_pin",
                     child: SvgPicture.asset(
                       'assets/svgs/pin.svg',
+                      color: Colors.white,
                     ),
                     onPressed: () {},
                   ),
                 ),
-                const SizedBox(height: 5,),
-                Text('핀 생성', style: fabTextStyle,)
+                SizedBox(height: 5.h,),
+                Text('핀 생성', style: kFabTextStyle,)
               ],
             ),
           ),
