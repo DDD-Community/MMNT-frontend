@@ -77,8 +77,9 @@ class _MyAppState extends State<MyApp> {
           return MaterialApp(
             title: 'dash_moment',
             debugShowCheckedModeBanner: false,
-            // home: MapScreen(),  // 기존 코드
-            home: ShowStory(_storyList[0].link), // 테스트 홈, 첫 이니셜 링크가 필요
+            // home: LoginScreen(),  // 기존 코드
+            // home: ShowStory(_storyList[0].link), // 테스트 홈, 첫 이니셜 링크가 필요
+
 
             // Dark theme 기반
             theme: ThemeData(
@@ -105,6 +106,11 @@ class _MyAppState extends State<MyApp> {
                 )
               ),
             ),
+            initialRoute: '/',
+            routes: {
+              '/' : (context) => const LoginScreen(),
+
+            },
           );
         },
       ),
