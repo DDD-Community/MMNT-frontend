@@ -37,6 +37,7 @@ dependencies:
   http: ^0.13.4
   flutter_native_splash: ^2.2.0
   email_validator: ^2.0.1
+  fluster: ^1.2.0
 
 dev_dependencies:
   flutter_test:

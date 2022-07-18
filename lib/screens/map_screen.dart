@@ -17,8 +17,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../component/map_marker.dart';
 import '../constants/style_constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:fluster/fluster.dart';
+
+import '../domain/pharmacy_details_model.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -26,24 +30,35 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  late GoogleMapController _mapController;
+  late String _mapStyle;
   String address = "지구어딘가";
+  Set<Marker> _showMarkers = {};
   final double _initFabHeight = 60.h;
   double _fabHeight = 0;
   double _panelHeightOpen = 284.h;
   double _panelHeightClosed = 50.h;
+
   late Position currentPosition;
-  late GoogleMapController _mapController;
-  late String _mapStyle;
-  Set<Marker> _showMarkers = {};
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   int markerSizeMedium = Platform.isIOS ? 65 : 45;
   GlobalKey? _keyGoogleMap = GlobalKey();
-  bool _isCameraReCenter = false;
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.532600, 127.024612),
     zoom: 14.4746,
   );
 
+  late BitmapDescriptor _pharmacyMarker;
+  late BitmapDescriptor _farPharmacyMarker;
+  List<LatLng> _nearestPharmacies = [];
+  PharmacyDetailsModel? _pharmacyDetailsModel;
+  List<PharmacyDetailsModel> _pharmacies = [];
+
+  bool _isCameraReCenter = false;
+  int _minClusterZoom = 0;
+  int _maxClusterZoom = 19;
+  late Fluster<MapMarker> _clusterManager;
+  double _currentZoom = 0;
 
   final Map<String, Marker> _markers = {
     'abc': Marker(
