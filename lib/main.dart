@@ -1,15 +1,18 @@
 import 'package:dash_mement/domain/story.dart';
+import 'package:dash_mement/providers/app_provider.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/screens/map_screen.dart';
 import 'package:dash_mement/screens/sign_in_screen.dart';
 import 'package:dash_mement/screens/sign_up_screen.dart';
+import 'package:dash_mement/userpage/user_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'constants/style_constants.dart';
+import 'providers/info_window_provider.dart';
 import 'providers/storylist_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/permission_screen.dart';
@@ -77,7 +80,9 @@ class _MyAppState extends State<MyApp> {
 
     return MultiProvider(
       providers: [
-        ListenableProvider(create: (_) => MapProvider()),
+        ChangeNotifierProvider(create: (_) => AppProvider()),
+        ChangeNotifierProvider(create: (_) => MapProvider()),
+        ChangeNotifierProvider(create: (_) => InfoWindowProvider()),
         ChangeNotifierProvider(create: (_) => StoryListProvider(_storyList)),
         ChangeNotifierProvider(create: (_) => PushStoryProvider())
       ],
@@ -134,12 +139,13 @@ class _MyAppState extends State<MyApp> {
                               borderSide: BorderSide(
                                   color: kTextFormFieldUnderlineColor,
                                   width: 1.5)))),
-                  initialRoute: '/',
+                  initialRoute: '/map-screen',
                   routes: {
                     '/': (context) => const LoginScreen(),
                     '/sign-up-screen': (context) => const SignUpScreen(),
                     '/sign-in-screen': (context) => const SignInScreen(),
                     '/map-screen': (context) => MapScreen(),
+                    '/show-story': (context) => ShowStory(_storyList[0].link),
 
                   },
                 );

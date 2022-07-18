@@ -57,6 +57,7 @@ flutter:
     - assets/config/
     - assets/lottie/
     - assets/gif/
+    - assets/marker/
 
   fonts:
     - family: Pretendard
