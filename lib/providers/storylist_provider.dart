@@ -4,7 +4,7 @@ import 'package:dash_mement/domain/story.dart';
 class StoryListProvider extends ChangeNotifier {
   late List<Story> _storyList = [];
 
-  StoryListProvider(this._storyList) {}
+  StoryListProvider() {}
 
   void add(Story story) {
     _storyList.add(story);

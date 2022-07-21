@@ -1,10 +1,13 @@
 import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/providers/app_provider.dart';
+import 'package:dash_mement/poststory/post_image.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/screens/map_screen.dart';
 import 'package:dash_mement/screens/sign_in_screen.dart';
 import 'package:dash_mement/screens/sign_up_screen.dart';
+import 'package:dash_mement/showstory/show_story_arguments.dart';
+import 'package:dash_mement/showstory/testScreen.dart';
 import 'package:dash_mement/userpage/user_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -44,9 +47,7 @@ class _MyAppState extends State<MyApp> {
         "./assets/test/v1_test.jpg",
         "밝게 빛나는 별이 되어 너를 비춰줄게 매일 어두워 헤맬 때도 앞이 두려워도\b 언제나 널 지켜줄게 세상이 널 아프게 할 땐 내가 안아줄게\n 매일포근한 바람으로 따듯한 햇살로난 널 지켜줄게 매일너의 모든 시간 속에 내가 함께할게",
         "SUN GOES DOWN",
-        "Lil Nas X",
-        37.5135790,
-        127.104765);
+        "Lil Nas X");
     Story _s2 = Story(
         "기분이 아주 좋아용",
         "익명2",
@@ -55,9 +56,7 @@ class _MyAppState extends State<MyApp> {
         "./assets/test/v2_test.jpg",
         "내 하드 드라이브엔 히트곡이 가득하지 이런 나랑 같은 날 곡을 내려고? 다시 생각해보셔 너에겐 ‘지방시’가 필요한 게 아니라 예수님이 필요하지",
         "First Class",
-        "Jack Harlow",
-        37.5135790,
-        127.104765);
+        "Jack Harlow");
     Story _s3 = Story(
         "여친이랑 원소주 픽업하러 왔어용!",
         "익명3",
@@ -66,9 +65,7 @@ class _MyAppState extends State<MyApp> {
         "./assets/test/h1_test.jpg",
         "오늘 여친이랑 더현대가서 원소주 사러 갔당가보니 제이팍도 있었다.이런 날은 글 남겨야징~",
         "GANADARA (Feat. IU)",
-        "Jay Park",
-        37.5135790,
-        127.104765);
+        "Jay Park");
     List<Story> _storyList = [_s1, _s2, _s3];
 
     return _storyList;
@@ -83,10 +80,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => MapProvider()),
         ChangeNotifierProvider(create: (_) => InfoWindowProvider()),
-        ChangeNotifierProvider(create: (_) => StoryListProvider(_storyList)),
+        ChangeNotifierProvider(create: (_) => StoryListProvider()),
         ChangeNotifierProvider(create: (_) => PushStoryProvider())
       ],
-
       child: FutureBuilder(
         future: Init.instance.initialize(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -107,6 +103,7 @@ class _MyAppState extends State<MyApp> {
 
                   // Dark theme 기반
                   theme: ThemeData(
+
                       fontFamily: 'Pretendard',
                       brightness: Brightness.dark,
                       highlightColor: Colors.yellow,
@@ -145,7 +142,11 @@ class _MyAppState extends State<MyApp> {
                     '/sign-up-screen': (context) => const SignUpScreen(),
                     '/sign-in-screen': (context) => const SignInScreen(),
                     '/map-screen': (context) => MapScreen(),
-                    '/show-story': (context) => ShowStory(_storyList[0].link),
+                    ShowStory.routeName: (context) => ShowStory(
+                        ModalRoute.of(context)!.settings.arguments
+                            as ShowStoryArguments),
+                    '/test-screen': (context) => TestScreen(),
+                    '/user-page-screen': (context) => UserPage()
 
                   },
                 );
