@@ -4,6 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 Color kGray = const Color(0xFF707077);
 Color kElevatedButtonColor = const Color(0xFF1E5EFF);
 Color kTextButtonColor = kGray;
+Color kTextFormFieldUnderlineColor = const Color(0xff1E5EFF);
+Color kAppbarIconColor = const Color(0xffbD9D9D9);
+
 TextStyle kFabTextStyle = TextStyle(fontWeight: FontWeight.w500, fontSize: 11.sp);
 TextStyle kWhiteBold21 =  TextStyle(fontWeight: FontWeight.w600, fontSize: 21.sp);
 TextStyle kWhiteBold24 =  TextStyle(fontWeight: FontWeight.w600, fontSize: 24.sp);

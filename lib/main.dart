@@ -99,35 +99,40 @@ class _MyAppState extends State<MyApp> {
 
                   // Dark theme 기반
                   theme: ThemeData(
-                    fontFamily: 'Pretendard',
-                    brightness: Brightness.dark,
-                    highlightColor: Colors.yellow,
-                    scaffoldBackgroundColor: Colors.black,
-                    appBarTheme: AppBarTheme(
-                        centerTitle: true,
-                        titleTextStyle: kGrayBold18,
-                        color: Colors.black,
-                        iconTheme: IconThemeData(
-                          color: Color(0xffbD9D9D9),
-                        )),
-                    floatingActionButtonTheme:
-                        const FloatingActionButtonThemeData(
-                      backgroundColor: Color(0xFF1E5EFF),
-                    ),
-                    textTheme: TextTheme(
-                      // bodyText2가 기본 텍스트 스타일
-                      bodyText2: TextStyle(
-                          fontSize: 16.sp, fontWeight: FontWeight.w700),
-                    ),
-                    elevatedButtonTheme: ElevatedButtonThemeData(
-                        style: ElevatedButton.styleFrom(
-                            primary: kElevatedButtonColor)),
-                    textButtonTheme: TextButtonThemeData(
-                        style: TextButton.styleFrom(
-                            primary: const Color(0xFF707077),
-                            textStyle: TextStyle(fontSize: 15.sp))),
-                  ),
-                  initialRoute: '/test-screen',
+
+                      fontFamily: 'Pretendard',
+                      brightness: Brightness.dark,
+                      highlightColor: Colors.yellow,
+                      scaffoldBackgroundColor: Colors.black,
+                      appBarTheme: AppBarTheme(
+                          centerTitle: true,
+                          titleTextStyle: kGrayBold18,
+                          color: Colors.black,
+                          iconTheme: IconThemeData(
+                            color: kAppbarIconColor,
+                          )),
+                      floatingActionButtonTheme:
+                          const FloatingActionButtonThemeData(
+                        backgroundColor: Color(0xFF1E5EFF),
+                      ),
+                      textTheme: TextTheme(
+                        // bodyText2가 기본 텍스트 스타일
+                        bodyText2: TextStyle(
+                            fontSize: 16.sp, fontWeight: FontWeight.w700),
+                      ),
+                      elevatedButtonTheme: ElevatedButtonThemeData(
+                          style: ElevatedButton.styleFrom(
+                              primary: kElevatedButtonColor)),
+                      textButtonTheme: TextButtonThemeData(
+                          style: TextButton.styleFrom(
+                              primary: const Color(0xFF707077),
+                              textStyle: TextStyle(fontSize: 15.sp))),
+                      inputDecorationTheme: InputDecorationTheme(
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: kTextFormFieldUnderlineColor,
+                                  width: 1.5)))),
+                  initialRoute: '/',
                   routes: {
                     '/': (context) => const LoginScreen(),
                     '/sign-up-screen': (context) => const SignUpScreen(),
@@ -138,6 +143,7 @@ class _MyAppState extends State<MyApp> {
                             as ShowStoryArguments),
                     '/test-screen': (context) => TestScreen(),
                     '/user-page-screen': (context) => UserPage()
+
                   },
                 );
               },
