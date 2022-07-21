@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:dash_mement/constants/file_constants.dart';
+import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/providers/app_provider.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/utils/permission_utils.dart';
@@ -10,9 +12,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:lottie/lottie.dart' as Lottie;
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,20 +22,15 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../apis/api_manager.dart';
-import '../component/map_helper.dart';
-import '../component/map_marker.dart';
 import '../constants/api_constants.dart';
 import '../constants/key_constants.dart';
-import '../constants/space_constants.dart';
 import '../constants/style_constants.dart';
 import 'package:http/http.dart' as http;
-import 'package:fluster/fluster.dart';
 
 import '../domain/error_model.dart';
 import '../domain/pharmacy_details_model.dart';
 import '../location/location_manager.dart';
 import '../providers/info_window_provider.dart';
-import '../utils/reusable_methods.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -61,77 +58,25 @@ class _MapScreenState extends State<MapScreen> {
 
   double _currentZoom = 14.4746;
   late BitmapDescriptor _momentMarker;
+  late BitmapDescriptor _pharmacyMarker;
+  late BitmapDescriptor _farPharmacyMarker;
+
+  List<Story> _stories = [];
+  List<LatLng> _pins = [];
 
   List<LatLng> _nearestPharmacies = [];
-
   PharmacyDetailsModel? _pharmacyDetailsModel;
   List<PharmacyDetailsModel> _pharmacies = [];
 
   bool _isCameraReCenter = false;
   int _minClusterZoom = 0;
   int _maxClusterZoom = 19;
-  late Fluster<MapMarker> _clusterManager;
-
-  Map<CircleId, Circle> circles = <CircleId, Circle>{};
-
-  CircleId? selectedCircle;
-
-  int _markerIdCounter = 0;
-  static const LatLng center = LatLng(37.5438072, 126.970694);
-  void _add() {
-    final int markerCount = markers.length;
-
-    if (markerCount == 12) {
-      return;
-    }
-
-    final String markerIdVal = 'marker_id_$_markerIdCounter';
-    _markerIdCounter++;
-    final MarkerId markerId = MarkerId(markerIdVal);
-
-    final Marker marker = Marker(
-      markerId: markerId,
-      position: LatLng(
-        center.latitude + sin(_markerIdCounter * pi / 6.0) / 20.0,
-        center.longitude + cos(_markerIdCounter * pi / 6.0) / 20.0,
-      ),
-      infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
-      onTap: () => {
-        print('_pc.open()'),
-        _pc.open()
-        // _onMarkerTapped(markerId),
-        //
-        // onMarkerTap: () {
-        //   LatLng latLng;
-        //   setState(() {
-        //     _pharmacyDetailsModel = element;
-        //     latLng = LatLng(
-        //         element.geometry.location.lat, element.geometry.location.lng);
-        //     Provider.of<InfoWindowProvider>(context, listen: false)
-        //         .updateVisibility(true);
-        //     _isCameraReCenter = true;
-        //     Provider.of<InfoWindowProvider>(context, listen: false)
-        //         .updateInfoWindow(context, _mapController, latLng: latLng);
-        //     Provider.of<InfoWindowProvider>(context, listen: false)
-        //         .rebuildInfoWindow();
-        //   });
-        // }
-      }
-      // onDragEnd: (LatLng position) => _onMarkerDragEnd(markerId, position),
-      // onDrag: (LatLng position) => _onMarkerDrag(markerId, position),
-    );
-
-    setState(() {
-      markers[markerId] = marker;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    _fabHeight = _initFabHeight;
+    _initialiseMarkerBitmap(context);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
-      _initialiseMarkerBitmap(context);
       Provider.of<InfoWindowProvider>(context, listen: false)
           .updateWidth(MediaQuery.of(context).size.width);
       Provider.of<InfoWindowProvider>(context, listen: false)
@@ -141,6 +86,7 @@ class _MapScreenState extends State<MapScreen> {
       });
       _getUserLocation(context);
     });
+    _fabHeight = _initFabHeight;
   }
 
   _getMapHeight() {
@@ -155,7 +101,7 @@ class _MapScreenState extends State<MapScreen> {
 
     PermissionUtils?.requestPermission(Permission.location, context,
         isOpenSettings: true, permissionGrant: () async {
-      await LocationService().fetchCurrentLocation(context, _getPinList,
+      await LocationService().fetchCurrentLocation(context, _getPinsList,
           updatePosition: updateCameraPosition);
     }, permissionDenied: () {
       Fluttertoast.showToast(
@@ -173,8 +119,14 @@ class _MapScreenState extends State<MapScreen> {
 
   _initialiseMarkerBitmap(BuildContext context) async {
     await _bitmapDescriptorFromSvgAsset(
-        context, FileConstants.icMomentPin, markerSizeMedium)
+            context, FileConstants.icMomentPin, markerSizeMedium)
         .then((value) => _momentMarker = value);
+    await _bitmapDescriptorFromSvgAsset(
+            context, FileConstants.icPharmacyMarker, markerSizeMedium)
+        .then((value) => _pharmacyMarker = value);
+    await _bitmapDescriptorFromSvgAsset(
+            context, FileConstants.icFarPharmacyMarker, markerSizeMedium)
+        .then((value) => _farPharmacyMarker = value);
   }
 
   Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
@@ -188,7 +140,30 @@ class _MapScreenState extends State<MapScreen> {
     return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
-  void _getPinList() async {
+  void _getPinsList() async {
+    ApiManager().getPins(ApiConstants.getPins(), context).then((value) {
+      setState(() {
+        _pins.clear();
+
+        _pharmacies.clear();
+        value.data['result'][0]['pinLists'].forEach((element) {
+          _pins.add(LatLng(
+            double.parse(element['pin_y']!),
+            double.parse(element['pin_x']!),
+          ));
+          // _stories.add(
+          //     Story(
+        });
+      });
+      _setMarkerUi();
+    }).catchError((e) {
+      if (e is ErrorModel) {
+        debugPrint("${e.response}");
+      }
+    });
+  }
+
+  void _getPlaceList() async {
     ApiManager()
         .getPlaces(
             ApiConstants.getPlaces(
@@ -232,7 +207,8 @@ class _MapScreenState extends State<MapScreen> {
                   : OpeningHours(openNow: false)));
         });
       });
-      _setMarkerUi();
+      _setMarkerUiforPlaces();
+      // _setMarkerUi();
     }).catchError((e) {
       if (e is ErrorModel) {
         debugPrint("${e.response}");
@@ -240,19 +216,18 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  void _setMarkerUi() {
+  void _setMarkerUiforPlaces() async {
     List<Marker> _generatedMapMarkers = [];
     // var i = 0;
+
     _nearestPharmacies.forEach((element) {
       // i++;
-      _generatedMapMarkers.add(Marker(
-
-          markerId: MarkerId(element.hashCode.toString()),
-          icon: _momentMarker,
-          position: LatLng(element.latitude, element.longitude),
-        onTap: _pc.open
-      ),
-
+      _generatedMapMarkers.add(
+        Marker(
+            markerId: MarkerId(element.hashCode.toString()),
+            icon: _momentMarker,
+            position: LatLng(element.latitude, element.longitude),
+            onTap: _pc.open),
       );
     });
     setState(() {
@@ -261,8 +236,32 @@ class _MapScreenState extends State<MapScreen> {
     });
     _mapController.animateCamera(
         CameraUpdate.newLatLngBounds(_getBounds(_nearestPharmacies), 50));
+
+    Future.delayed(const Duration(seconds: 3), _pc.open);
   }
 
+  void _setMarkerUi() async {
+    List<Marker> _generatedMapMarkers = [];
+    // var i = 0;
+    _pins.forEach((element) {
+      // i++;
+      _generatedMapMarkers.add(
+        Marker(
+            markerId: MarkerId(element.hashCode.toString()),
+            icon: _momentMarker,
+            // icon: markerbitmap,
+            position: LatLng(element.latitude, element.longitude),
+            onTap: _pc.open),
+      );
+    });
+    setState(() {
+      _showMarkers.clear();
+      _showMarkers.addAll(_generatedMapMarkers);
+    });
+    _mapController
+        .animateCamera(CameraUpdate.newLatLngBounds(_getBounds(_pins), 50));
+    Future.delayed(const Duration(seconds: 3), _pc.open);
+  }
 
   LatLngBounds _getBounds(List<LatLng> markerLocations) {
     var lngs = markerLocations.map<double>((m) => m.longitude).toList();
@@ -335,9 +334,9 @@ class _MapScreenState extends State<MapScreen> {
             }),
             body: SafeArea(
               child: Scaffold(body: Consumer<InfoWindowProvider>(
-
                 builder: (BuildContext contex, infoWindowProvider, __) {
-                  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+                  final GlobalKey<ScaffoldState> _scaffoldKey =
+                      GlobalKey<ScaffoldState>();
                   return Stack(children: [
                     GoogleMap(
                       myLocationEnabled: true,
@@ -436,6 +435,14 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ],
                 ),
+                SizedBox(
+                  height: 42.h,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child:
+                      _showMarkers.isEmpty ? DummyMainMoment() : NoPinMoment(),
+                ),
               ],
             ),
           ),
@@ -458,7 +465,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                     onPressed: () {
                       _pc.close();
-
+                      _getUserLocation(context);
                     },
                   ),
                 ),
@@ -474,7 +481,7 @@ class _MapScreenState extends State<MapScreen> {
           ),
           Positioned(
             right: 20.0,
-            bottom: _fabHeight + 80.h,
+            bottom: _fabHeight + 90.h,
             child: Column(
               children: [
                 SizedBox(
@@ -488,7 +495,6 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                       onPressed: () {
                         // _add();
-                        _getUserLocation(context);
                       }),
                 ),
                 SizedBox(
@@ -503,6 +509,111 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class DummyMainMoment extends StatelessWidget {
+  const DummyMainMoment({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              '여기 완전 노을 맛집',
+              style: kWhiteBold20,
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 16.h,
+        ),
+        Container(
+          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 16.h),
+          height: 160.h,
+          width: 335.w,
+          color: Color(0xff1E1E21),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      Text(
+                        'Dar+ling',
+                        style: kGrayBold18.copyWith(color: Colors.white),
+                      ),
+                      Text(
+                        'SEVENTEEN',
+                        style: kGray12,
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Lottie.Lottie.asset("assets/json/equalizer.json"))
+                ],
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
+                ),
+                child: const Text(
+                  '지금 이곳에 기록된 모먼트 보기',
+                ),
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class NoPinMoment extends StatelessWidget {
+  const NoPinMoment({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 16.h,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SizedBox(
+              height: 115.h,
+              width: 115.w,
+              child: SvgPicture.asset(
+                'assets/svgs/no-pin.svg',
+              ),
+            ),
+            Text(
+              '근처 핀 없음',
+              style: kGrayBold18.copyWith(color: Colors.white),
+            ),
+            Text(
+              '핀이 있는 위치 근처로 이동해주세요',
+              style: kGray12,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

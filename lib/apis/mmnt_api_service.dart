@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -89,7 +91,8 @@ class MmntApiService {
       }
       return await (_dio!.patch(
         endUrl,
-        queryParameters: params,
+        data: jsonEncode(params),
+        // queryParameters: params,
         options: options,
       ));
     } on DioError catch (e) {

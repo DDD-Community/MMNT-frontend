@@ -3,8 +3,11 @@ import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../component/error_dialog.dart';
+import '../domain/error_model.dart';
+import '../constants/token_temp_file.dart' as Token;
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -29,13 +32,14 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       var response = await Dio().post('https://dev.mmnt.link/user/sign-in', data: {'email': emailController.text.trim(), 'password': passwordController.text.trim()});
 
-      print(response);
       if(response.data['isSuccess']) {
+        // TODO shared preference로 토큰 관리
+        Token.jwt_token = response.data['result']['accessToken'];
         Navigator.pushNamed(context, '/map-screen');
       }
-    } catch (e) {
-      print(e);
-      errorDialog(context, '${e.toString()}');
+    } on DioError catch (error) {
+      var errorMsg = ErrorModel.fromJson(error.response?.data);
+      errorDialog(context, errorMsg.message.toString());
     }
   }
 

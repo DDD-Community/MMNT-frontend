@@ -4,6 +4,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/style_constants.dart';
+import '../domain/error_model.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -40,9 +41,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           isVerificationMailSent = true;
         });
       }
-    } on DioError catch (e) {
-      print(e);
-      errorDialog(context, e.message);
+    } on DioError catch (error) {
+      var errorMsg = ErrorModel.fromJson(error.response?.data);
+      errorDialog(context, errorMsg.message.toString());
     }
   }
 
@@ -78,8 +79,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (response.data['isSuccess']) {
         // 회원가입 완료, 로그인 페이지로 이동
       }
-    } on DioError catch (e) {
-      errorDialog(context, e.message);
+    } on DioError catch (error) {
+      var errorMsg = ErrorModel.fromJson(error.response?.data);
+      errorDialog(context, errorMsg.message.toString());
     }
   }
 

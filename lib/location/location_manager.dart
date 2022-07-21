@@ -75,6 +75,9 @@ class LocationService {
         null) {
       await getMapData();
       _getLocationUpdates(context, getLoc, getMapData);
+      String newAddress = await _getAddress(getLoc.latitude!.toDouble(), getLoc.longitude!.toDouble());
+      Provider.of<MapProvider>(context, listen: false).updateCurrentAddress(newAddress);
+
     }
   }
 
@@ -88,8 +91,6 @@ class LocationService {
       final distance = calculateDistance(value.latitude, value.longitude,
           locationData.latitude, locationData.longitude);
 
-      String newAddress = await _getAddress(value.latitude!.toDouble(), value.longitude!.toDouble());
-      Provider.of<MapProvider>(context, listen: false).updateCurrentAddress(newAddress);
       Provider.of<MapProvider>(context, listen: false).updateCurrentLocation(
           LatLng(value.latitude!.toDouble(), value.longitude!.toDouble()));
       locationData = value;

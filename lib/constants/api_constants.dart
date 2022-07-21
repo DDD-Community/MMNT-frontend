@@ -1,9 +1,11 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+
+
 class ApiConstants {
 
   static String getPins() {
-    return 'https://dev.mmnt.link/moment';
+    return 'https://dev.mmnt.link/user/location';
   }
 
   static String getPlaces(LatLng input, String googleApiKey) {
