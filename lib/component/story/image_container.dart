@@ -69,7 +69,7 @@ class ImageContainer extends StatelessWidget {
 
   ImageProvider<Object> _getCurrentImage() {
     if (_storyType == StoryType.Story) {
-      return AssetImage(_story!.img);
+      return NetworkImage(_story!.img);
     } else if ((_storyType == StoryType.File) ||
         (_storyType == StoryType.Input) ||
         (_storyType == StoryType.Check)) {
@@ -95,14 +95,6 @@ class ImageContainer extends StatelessWidget {
 
   InputColumn _getInputColumn() {
     return InputColumn();
-  }
-
-  // 데이터 제출 critical
-  Map<String, dynamic> submitInput() {
-    assert(_storyType == StoryType.Input, "Not StoryType Input");
-    Map<String, dynamic> hi = {};
-    print("imageContainer");
-    return hi;
   }
 
   @override

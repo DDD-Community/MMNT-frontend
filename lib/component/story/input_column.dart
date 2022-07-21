@@ -78,7 +78,7 @@ class _InputColumn extends State<InputColumn> {
 
   void _showTitleToast() {
     Widget toast =
-        MnmtErrorToast(message: "제목은 16글자까지 작성할 수 있습니다.", width: 240);
+        MnmtErrorToast(message: "제목은 16글자까지 작성할 수 있습니다.", width: 280);
     final viewInsets = EdgeInsets.fromWindowPadding(
         WidgetsBinding.instance.window.viewInsets,
         WidgetsBinding.instance.window.devicePixelRatio);
@@ -95,7 +95,7 @@ class _InputColumn extends State<InputColumn> {
 
   void _showContextToast() {
     Widget toast =
-        MnmtErrorToast(message: "본문은 80글자까지 작성할 수 있습니다.", width: 260);
+        MnmtErrorToast(message: "본문은 80글자까지 작성할 수 있습니다.", width: 280);
     final viewInsets = EdgeInsets.fromWindowPadding(
         WidgetsBinding.instance.window.viewInsets,
         WidgetsBinding.instance.window.devicePixelRatio);
@@ -142,7 +142,7 @@ class _InputColumn extends State<InputColumn> {
                   onChanged: (text) {
                     if (text.length > 16) {
                       _showTitleToast();
-                      _titleController.text = _pushStory.title;
+                      _titleController.text = _pushStory.title!;
                     } else {
                       _pushStory.title = text;
                     }

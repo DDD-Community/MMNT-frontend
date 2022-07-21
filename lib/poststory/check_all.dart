@@ -39,8 +39,8 @@ class _CheckAll extends State<CheckAll> {
     super.initState();
   }
 
-  _showToast() {
-    Widget toast = MnmtErrorToast(message: "업로드 실패!", width: 180);
+  _showToast(String message, double width) {
+    Widget toast = MnmtErrorToast(message: message, width: width);
     _ftoast.showToast(
         child: toast,
         toastDuration: Duration(milliseconds: 3000),
@@ -65,25 +65,23 @@ class _CheckAll extends State<CheckAll> {
   }
 
   String _getCurrentUserToken() {
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NTc5ODk4MjIsImV4cCI6MTY1Nzk5MzQyMn0.hGzcBaEPUbts5I8dce8xdPSHtJQFb5HgSmR_sWTIycE";
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NTc5OTcwMzMsImV4cCI6MTY1ODAwMDYzM30.PyDhlaAViCxtDLWBscJMW8w4ylyjQZpXfVldRoSdbn4";
   }
 
   void _submit() async {
-    print(_pushStoryProvider.latitude_y);
-    print(_pushStoryProvider.longitude_x);
-    String imageUrl = await _uploadUrl(_pushStoryProvider.path);
+    String imageUrl = await _uploadUrl(_pushStoryProvider.path!);
     if (imageUrl == "ERROR") {
-      print("error"); // 에러 처리 해줘야함
+      _showToast("사진 업로드 실패!", 200); // 에러 처리 해줘야함
     } else {
       final postUrl = Uri.parse("https://dev.mmnt.link/moment");
       final token = _getCurrentUserToken();
       try {
-        var data = {
+        var data = <String, dynamic>{
           "pinX": _pushStoryProvider.longitude_x,
           "pinY": _pushStoryProvider.latitude_y,
           "title": _pushStoryProvider.title,
           "description": _pushStoryProvider.context,
-          "imageUrl": postUrl,
+          "imageUrl": imageUrl,
           "youtubeUrl": _pushStoryProvider.link,
           "music": _pushStoryProvider.track,
           "artist": _pushStoryProvider.artist
@@ -97,9 +95,11 @@ class _CheckAll extends State<CheckAll> {
             },
             body: body);
         print("flutter post test: ${response.body}");
+        _pushStoryProvider.clear();
+        Navigator.popUntil(context, ModalRoute.withName("/show-story-screen"));
       } catch (e) {
         print("flutter_error: ${e.toString()}");
-        _showToast();
+        _showToast("업로드 실패", 180);
       }
     }
   }
@@ -166,16 +166,14 @@ class _CheckAll extends State<CheckAll> {
                       MediaQuery.of(context).size,
                       _pushStoryProvider.path,
                       Story(
-                          _pushStoryProvider.title,
+                          _pushStoryProvider.title!,
                           _getCurrenttUser(), // user
-                          _pushStoryProvider.dateTime,
-                          _pushStoryProvider.link,
+                          _pushStoryProvider.dateTime!,
+                          _pushStoryProvider.link!,
                           "", // img
                           _pushStoryProvider.context,
-                          _pushStoryProvider.track,
-                          _pushStoryProvider.artist,
-                          _pushStoryProvider.latitude_y,
-                          _pushStoryProvider.longitude_x))
+                          _pushStoryProvider.track!,
+                          _pushStoryProvider.artist!))
                 ])));
   }
 }

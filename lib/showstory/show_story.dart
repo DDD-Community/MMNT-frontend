@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dash_mement/poststory/post_image.dart';
 import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
+import 'package:dash_mement/showstory/show_story_arguments.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
@@ -23,9 +24,12 @@ Issue: story text 크기 제한
 Issue: location에 대한 재정의 필요, dependency: story, pushstory_provider 이하 위젯 
 */
 class ShowStory extends StatefulWidget {
-  late String _initialVideoLink;
+  final ShowStoryArguments _args;
+  const ShowStory(this._args, {Key? key}) : super(key: key);
+  // late String _initialVideoLink;
 
-  ShowStory(this._initialVideoLink);
+  static const routeName = "/show-story-screen";
+
   @override
   State<StatefulWidget> createState() {
     return _ShowStory();
@@ -69,15 +73,22 @@ class _ShowStory extends State<ShowStory> {
     final response_building = await http.get(url_building,
         headers: {"Accept": "aplication/json", "appKey": API_KEY});
 
-    // 도로명 + 건물 번호
-    return "${jsonDecode(response_main.body)["addressInfo"]['fullAddress']} ${jsonDecode(response_building.body)["addressInfo"]["buildingIndex"]}";
+    if (response_main.statusCode == 200 &&
+        response_building.statusCode == 200) {
+      // 도로명 + 건물 번호
+      return "${jsonDecode(response_main.body)["addressInfo"]['fullAddress']} ${jsonDecode(response_building.body)["addressInfo"]["buildingIndex"]}";
+    } else {
+      print("플러터: ${response_main.statusCode}");
+      print("플러터: ${response_building.statusCode}");
+      throw Exception();
+    }
   }
 
   @override
   void initState() {
     _youtubePlayerController = YoutubePlayerController(
         initialVideoId:
-            YoutubePlayer.convertUrlToId(widget._initialVideoLink) ?? "error",
+            YoutubePlayer.convertUrlToId(this.widget._args.firstUrl) ?? "error",
         flags: YoutubePlayerFlags(
           autoPlay: true,
           mute: false,
@@ -102,10 +113,6 @@ class _ShowStory extends State<ShowStory> {
   Widget build(BuildContext context) {
     _storyList = Provider.of<StoryListProvider>(context);
     _pushStory = Provider.of<PushStoryProvider>(context);
-
-    double lat_y = _storyList.getStoryAt(0).latitude_y;
-    double lng_x = _storyList.getStoryAt(0).longitude_x;
-
     //storywidget 생성 / urlList 생성
     _storyWidgetList = [];
     for (int i = 0; i < _storyList.getLength(); i++) {
@@ -128,7 +135,8 @@ class _ShowStory extends State<ShowStory> {
           backgroundColor: MmntStyle().mainBlack,
           shadowColor: Colors.transparent,
           title: FutureBuilder(
-              future: _getAddress(lat_y, lng_x),
+              future:
+                  _getAddress(this.widget._args.lat_y, this.widget._args.lng_x),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Text(
@@ -185,7 +193,8 @@ class _ShowStory extends State<ShowStory> {
         ])),
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () => _postStory(lat_y, lng_x, _pushStory),
+          onPressed: () => _postStory(
+              this.widget._args.lat_y, this.widget._args.lng_x, _pushStory),
           backgroundColor: MmntStyle().primary,
           child: Icon(
             Icons.add,
