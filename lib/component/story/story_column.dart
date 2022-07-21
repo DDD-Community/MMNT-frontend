@@ -14,7 +14,7 @@ class StoryColumn extends StatelessWidget {
 
   StoryColumn(this._story) {
     _dateWidget = DateWidget(this._story.dateTime);
-    _userNameWidget = UserNameWidget(this._story.user);
+    _userNameWidget = UserNameWidget.fromId(this._story.user);
     _trackInfoWidget = TrackInfoWidget(this._story.track, this._story.artist);
     _storyText = StoryText(this._story.title, this._story.msg);
   }
