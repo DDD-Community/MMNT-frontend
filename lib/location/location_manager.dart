@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/utils/reusable_methods.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +28,7 @@ class LocationService {
       if (_hasLocationPermission == PermissionStatus.granted) {
         grantedPermissionMethod(context, getLocation, mapData,
             updatePosition: updatePosition);
+
       } else if (_hasLocationPermission == PermissionStatus.denied) {
         var _permissionGranted = await location.requestPermission();
         if (_permissionGranted == PermissionStatus.granted) {
@@ -71,6 +75,9 @@ class LocationService {
         null) {
       await getMapData();
       _getLocationUpdates(context, getLoc, getMapData);
+      String newAddress = await _getAddress(getLoc.latitude!.toDouble(), getLoc.longitude!.toDouble());
+      Provider.of<MapProvider>(context, listen: false).updateCurrentAddress(newAddress);
+
     }
   }
 
@@ -80,9 +87,10 @@ class LocationService {
 
   Future<void> _getLocationUpdates(BuildContext context,
       LocationData locationData, Function callUpdateData) async {
-    location.onLocationChanged.listen((value) {
+    location.onLocationChanged.listen((value) async {
       final distance = calculateDistance(value.latitude, value.longitude,
           locationData.latitude, locationData.longitude);
+
       Provider.of<MapProvider>(context, listen: false).updateCurrentLocation(
           LatLng(value.latitude!.toDouble(), value.longitude!.toDouble()));
       locationData = value;
@@ -91,4 +99,21 @@ class LocationService {
       }
     });
   }
+}
+
+
+// TODO 위치 수정 필요
+Future<String> _getAddress(double lat, double lng) async {
+  String? API_KEY = dotenv.env["TMAP_KEY"];
+  final url_main = Uri.parse(
+      "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A03&newAddressExtend=Y");
+  final url_building = Uri.parse(
+      "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A04&newAddressExtend=Y");
+  final response_main = await http.get(url_main,
+      headers: {"Accept": "aplication/json", "appKey": API_KEY!});
+  final response_building = await http.get(url_building,
+      headers: {"Accept": "aplication/json", "appKey": API_KEY});
+
+  // 도로명 + 건물 번호
+  return "${jsonDecode(response_main.body)["addressInfo"]['fullAddress']} ${jsonDecode(response_building.body)["addressInfo"]["buildingIndex"]}";
 }

@@ -35,4 +35,5 @@ class Story {
   String get artist => _artist;
   // double get latitude_y => _lat_y;
   // double get longitude_x => _lng_x;
+
 }
