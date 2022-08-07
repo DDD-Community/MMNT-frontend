@@ -15,7 +15,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'constants/style_constants.dart';
-import 'providers/info_window_provider.dart';
+import 'providers/sliidng_panel_provider.dart';
 import 'providers/storylist_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/permission_screen.dart';
@@ -79,7 +79,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => MapProvider()),
-        ChangeNotifierProvider(create: (_) => InfoWindowProvider()),
+        ChangeNotifierProvider(create: (_) => SlidingPanelProvider()),
         ChangeNotifierProvider(create: (_) => StoryListProvider()),
         ChangeNotifierProvider(create: (_) => PushStoryProvider())
       ],
