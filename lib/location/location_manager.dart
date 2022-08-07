@@ -75,8 +75,9 @@ class LocationService {
         null) {
       await getMapData();
       _getLocationUpdates(context, getLoc, getMapData);
-      String newAddress = await _getAddress(getLoc.latitude!.toDouble(), getLoc.longitude!.toDouble());
-      Provider.of<MapProvider>(context, listen: false).updateCurrentAddress(newAddress);
+
+      // String newAddress = await _getAddress(getLoc.latitude!.toDouble(), getLoc.longitude!.toDouble());
+      // Provider.of<MapProvider>(context, listen: false).updateCurrentAddress(newAddress);
 
     }
   }
@@ -102,18 +103,3 @@ class LocationService {
 }
 
 
-// TODO 위치 수정 필요
-Future<String> _getAddress(double lat, double lng) async {
-  String? API_KEY = dotenv.env["TMAP_KEY"];
-  final url_main = Uri.parse(
-      "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A03&newAddressExtend=Y");
-  final url_building = Uri.parse(
-      "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A04&newAddressExtend=Y");
-  final response_main = await http.get(url_main,
-      headers: {"Accept": "aplication/json", "appKey": API_KEY!});
-  final response_building = await http.get(url_building,
-      headers: {"Accept": "aplication/json", "appKey": API_KEY});
-
-  // 도로명 + 건물 번호
-  return "${jsonDecode(response_main.body)["addressInfo"]['fullAddress']} ${jsonDecode(response_building.body)["addressInfo"]["buildingIndex"]}";
-}

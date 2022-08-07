@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart' as Lottie;
@@ -30,7 +31,7 @@ import 'package:http/http.dart' as http;
 import '../domain/error_model.dart';
 import '../domain/pharmacy_details_model.dart';
 import '../location/location_manager.dart';
-import '../providers/info_window_provider.dart';
+import '../providers/sliidng_panel_provider.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -77,10 +78,10 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _initialiseMarkerBitmap(context);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
-      Provider.of<InfoWindowProvider>(context, listen: false)
-          .updateWidth(MediaQuery.of(context).size.width);
-      Provider.of<InfoWindowProvider>(context, listen: false)
-          .updateHeight(_getMapHeight());
+      // Provider.of<SlidingPanelProvider>(context, listen: false)
+      //     .updateWidth(MediaQuery.of(context).size.width);
+      // Provider.of<SlidingPanelProvider>(context, listen: false)
+      //     .updateHeight(_getMapHeight());
       rootBundle.loadString(FileConstants.mapStyle).then((string) {
         _mapStyle = string;
       });
@@ -96,20 +97,55 @@ class _MapScreenState extends State<MapScreen> {
     return size?.height;
   }
 
-  Future<void> _getUserLocation(BuildContext context) async {
-    context.read<AppProvider>().updateAppState(AppStatus.loading);
 
-    PermissionUtils?.requestPermission(Permission.location, context,
-        isOpenSettings: true, permissionGrant: () async {
-      await LocationService().fetchCurrentLocation(context, _getPinsList,
-          updatePosition: updateCameraPosition);
-    }, permissionDenied: () {
-      Fluttertoast.showToast(
-          backgroundColor: Colors.blue,
-          msg:
-              "Please grant the required permission from settings to access this feature.");
-    });
-    context.read<AppProvider>().updateAppState(AppStatus.loaded);
+  // TODO 위치 수정 필요
+  Future<String> _getAddress(double lat, double lng) async {
+    String? API_KEY = dotenv.env["TMAP_KEY"];
+    final url_main = Uri.parse(
+        "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A03&newAddressExtend=Y");
+    final url_building = Uri.parse(
+        "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A04&newAddressExtend=Y");
+    final response_main = await http.get(url_main,
+        headers: {"Accept": "aplication/json", "appKey": API_KEY!});
+    final response_building = await http.get(url_building,
+        headers: {"Accept": "aplication/json", "appKey": API_KEY});
+
+    // 도로명 + 건물 번호
+    return "${jsonDecode(response_main.body)["addressInfo"]['fullAddress']} ${jsonDecode(response_building.body)["addressInfo"]["buildingIndex"]}";
+  }
+
+
+  Future<void> _getUserLocation(BuildContext context) async {
+
+
+    LocationPermission permission = await Geolocator.requestPermission();
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    currentPosition = position;
+    LatLng latlngPosition = LatLng(position.latitude, position.longitude);
+    String newAddress = await _getAddress(position.latitude!.toDouble(), position.longitude!.toDouble());
+    Provider.of<MapProvider>(context, listen: false).updateCurrentAddress(newAddress);
+    _getPinsList(latlngPosition);
+    // await LocationService().fetchCurrentLocation(context, _getPinsList,
+    //     updatePosition: updateCameraPosition);
+    // LatLng latlngPosition = LatLng(position.latitude, position.longitude);
+    // CameraPosition cameraPosition =
+    //     new CameraPosition(target: latlngPosition, zoom: 14);
+    // _mapController
+    //     .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+    //
+    // PermissionUtils?.requestPermission(Permission.location, context,
+    //     isOpenSettings: true, permissionGrant: () async {
+    //   await LocationService().fetchCurrentLocation(context, _getPinsList,
+    //       updatePosition: updateCameraPosition);
+    // }, permissionDenied: () {
+    //   Fluttertoast.showToast(
+    //       backgroundColor: Colors.blue,
+    //       msg:
+    //           "Please grant the required permission from settings to access this feature.");
+    // });
+    // context.read<AppProvider>().updateAppState(AppStatus.loaded);
   }
 
   void updateCameraPosition(CameraPosition cameraPosition) {
@@ -140,8 +176,10 @@ class _MapScreenState extends State<MapScreen> {
     return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
-  void _getPinsList() async {
-    ApiManager().getPins(ApiConstants.getPins(), context).then((value) {
+  void _getPinsList(LatLng latlngPosition) async {
+    Provider.of<AppProvider>(context, listen: false)
+        .updateAppState(AppStatus.loading);
+    ApiManager().getPins(ApiConstants.getPins(), latlngPosition).then((value) {
       setState(() {
         _pins.clear();
 
@@ -237,10 +275,13 @@ class _MapScreenState extends State<MapScreen> {
     _mapController.animateCamera(
         CameraUpdate.newLatLngBounds(_getBounds(_nearestPharmacies), 50));
 
+
+    // context.read<AppProvider>().updateAppState(AppStatus.loaded);
     Future.delayed(const Duration(seconds: 3), _pc.open);
   }
 
   void _setMarkerUi() async {
+    // context.watch<AppProvider>().updateAppState(AppStatus.loading);
     List<Marker> _generatedMapMarkers = [];
     // var i = 0;
     _pins.forEach((element) {
@@ -254,13 +295,16 @@ class _MapScreenState extends State<MapScreen> {
             onTap: _pc.open),
       );
     });
+    Provider.of<AppProvider>(context, listen: false).updateAppState(AppStatus.loaded);
+
     setState(() {
       _showMarkers.clear();
       _showMarkers.addAll(_generatedMapMarkers);
     });
     _mapController
         .animateCamera(CameraUpdate.newLatLngBounds(_getBounds(_pins), 50));
-    Future.delayed(const Duration(seconds: 3), _pc.open);
+
+    Future.delayed(const Duration(seconds: 2), _pc.open);
   }
 
   LatLngBounds _getBounds(List<LatLng> markerLocations) {
@@ -311,6 +355,8 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<AppProvider>();
+
     BorderRadiusGeometry slidingPanelRadius = const BorderRadius.only(
       topLeft: Radius.circular(24.0),
       topRight: Radius.circular(24.0),
@@ -333,7 +379,7 @@ class _MapScreenState extends State<MapScreen> {
                   _initFabHeight;
             }),
             body: SafeArea(
-              child: Scaffold(body: Consumer<InfoWindowProvider>(
+              child: Scaffold(body: Consumer<SlidingPanelProvider>(
                 builder: (BuildContext contex, infoWindowProvider, __) {
                   final GlobalKey<ScaffoldState> _scaffoldKey =
                       GlobalKey<ScaffoldState>();
@@ -464,6 +510,7 @@ class _MapScreenState extends State<MapScreen> {
                       color: Colors.black,
                     ),
                     onPressed: () {
+                      HapticFeedback.mediumImpact();
                       _pc.close();
                       _getUserLocation(context);
                     },
@@ -494,6 +541,7 @@ class _MapScreenState extends State<MapScreen> {
                         color: Colors.white,
                       ),
                       onPressed: () {
+                        HapticFeedback.mediumImpact();
                         // _add();
                       }),
                 ),
@@ -507,6 +555,10 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
           ),
+
+          state.appStatus == AppStatus.loading
+              ? const Center(child: CircularProgressIndicator())
+              : Container(),
         ],
       ),
     );
@@ -599,8 +651,8 @@ class NoPinMoment extends StatelessWidget {
             SizedBox(
               height: 115.h,
               width: 115.w,
-              child: SvgPicture.asset(
-                'assets/svgs/no-pin.svg',
+              child: Image.asset(
+                'assets/images/no-pin.png',
               ),
             ),
             Text(
