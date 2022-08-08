@@ -258,8 +258,14 @@ class _MapScreenState extends State<MapScreen> {
       _showMarkers.clear();
       _showMarkers.addAll(_generatedMapMarkers);
     });
-    _mapController
-        .animateCamera(CameraUpdate.newLatLngBounds(_getBounds(_pins), 50));
+
+    if(_pins.isEmpty) {
+      // todoL zoom
+    } else {
+      _mapController
+          .animateCamera(CameraUpdate.newLatLngBounds(_getBounds(_pins), 50));
+    }
+
     Future.delayed(const Duration(seconds: 3), _pc.open);
   }
 
