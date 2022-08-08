@@ -61,7 +61,7 @@ class _SignInScreenState extends State<SignInScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
-                  children: [
+                  children: const [
                     Text(
                       '이메일',
                       style: TextStyle(
@@ -72,6 +72,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   ],
                 ),
                 TextFormField(
+                  keyboardType: TextInputType.emailAddress,
                   validator: (value) => EmailValidator.validate(value!) ? null : "Please enter a valid email",
                   controller: emailController,
                   decoration: InputDecoration(
@@ -94,6 +95,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   ],
                 ),
                 TextFormField(
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
                   controller: passwordController,
                   decoration: InputDecoration(
                       hintText: '비밀번호 (영문+숫자+특수문자 10자 이상)',

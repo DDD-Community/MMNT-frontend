@@ -21,6 +21,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isVerificationMailSent = false;
   bool isVerificationMatch = false;
   final _formKey = GlobalKey<FormState>();
+  FocusNode _emailFocus = FocusNode();
+  FocusNode _passwordFocus = FocusNode();
 
   @override
   void dispose() {
@@ -117,6 +119,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   children: [
                     Expanded(
                       child: TextFormField(
+                        focusNode: _emailFocus,
+                        keyboardType: TextInputType.emailAddress,
                         validator: (value) => EmailValidator.validate(value!)
                             ? null
                             : "Please enter a valid email",
@@ -166,6 +170,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Column(
                     children: [
                       TextFormField(
+                        focusNode: _passwordFocus,
+                        obscureText: true,
+                        keyboardType: TextInputType.visiblePassword,
                         controller: passwordController,
                         decoration: InputDecoration(
                             hintText: '비밀번호 (영문+숫자+특수문자 10자 이상)', hintStyle: kGray14.copyWith(fontWeight: FontWeight.w500,),),
@@ -181,6 +188,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                       ),
                       TextFormField(
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                         controller: passwordCheckController,
                         decoration: InputDecoration(hintText: '비밀번호 확인',
                             hintStyle: kGray14.copyWith(fontWeight: FontWeight.w500,)),
