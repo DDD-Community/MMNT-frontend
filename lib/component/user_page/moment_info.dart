@@ -1,3 +1,4 @@
+import 'package:dash_mement/domain/story.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -29,8 +30,13 @@ class MomentInfo extends StatelessWidget {
         ]));
   }
 
-  Widget _moment(Size size, int index, int length, Map<String, dynamic> json) {
+  Widget _moment(Size size, int index, int length, StorySub story) {
     length -= 1;
+    String _date =
+        "${story.time.year}년 ${story.time.month}월 ${story.time.day}일";
+    String _time = story.time.hour > 12
+        ? "오후 ${story.time.hour - 12}시 ${story.time.minute}분"
+        : "오전 ${story.time.hour}시 ${story.time.minute}분";
     EdgeInsets positionMargin;
     if (index == 0) {
       positionMargin = EdgeInsets.only(left: 20);
@@ -47,20 +53,20 @@ class MomentInfo extends StatelessWidget {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             image: DecorationImage(
-                image: NetworkImage(json["image_url"]),
+                image: NetworkImage(story.image_url),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                     Colors.black.withOpacity(0.4), BlendMode.darken))),
         child: Column(children: [
           Padding(
               padding: EdgeInsets.only(top: 14, bottom: 2),
-              child: Text("2022년 5월 6알",
+              child: Text(_date,
                   style: TextStyle(
                       fontFamily: "Pretendard",
                       fontSize: 10,
                       fontWeight: FontWeight.w400,
                       letterSpacing: -0.4))),
-          Text("오후 6시 3분",
+          Text(_time,
               style: TextStyle(
                   fontFamily: "Pretendard",
                   fontSize: 10,
@@ -68,7 +74,7 @@ class MomentInfo extends StatelessWidget {
                   letterSpacing: -0.4)),
           Expanded(
               child: Center(
-                  child: Text(json["title"],
+                  child: Text(story.title,
                       style: TextStyle(
                           fontFamily: "Pretendard",
                           fontSize: 14,
@@ -79,38 +85,28 @@ class MomentInfo extends StatelessWidget {
 
   Future<String> _getCurrentUserToken() async {
     Future.delayed(Duration(milliseconds: 100));
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NTgyMDU1OTUsImV4cCI6MTY1ODIwOTE5NX0.AT8v6-8WqNr0lHqqdDiUSo2fnhl9UKUak0fhHFadT-Q";
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NjA1MzczMjUsImV4cCI6MTY2MTc0NjkyNX0.Sh63lxc7Bu1dizWa36ZdgbCDnxxrXYZ-74SmfEI5Buo";
   }
 
-  Future<List<Map<String, dynamic>>> _getMoment() async {
+  Future<List<StorySub>> _getMoment() async {
     final token = await _getCurrentUserToken();
-    final String totalPage = await _getTotalPage(token);
+    final String totalPage = "5";
     final url = Uri.parse(
         'https://dev.mmnt.link/moment/my-history?page=1&limit=$totalPage&type=main');
     final response = await http.get(url, headers: {
       "accept": "aplication/json",
       "Authorization": "Bearer $token"
     });
-    Map<String, dynamic> json = jsonDecode(utf8.decode(response.bodyBytes));
+    if (response.statusCode == 200) {
+      List<dynamic> json = jsonDecode(response.body)["result"];
 
-    List<Map<String, dynamic>> result = [];
-    List list = json["result"];
-    list.forEach((element) {
-      result.add(jsonDecode(element));
-    });
-
-    return result;
-  }
-
-  Future<String> _getTotalPage(String token) async {
-    final url = Uri.parse("https://dev.mmnt.link/user/profile-info");
-    final response = await http.get(url, headers: {
-      "accept": "aplication/json",
-      "Authorization": "Bearer $token"
-    });
-    print(response.body);
-    Map<String, dynamic> json = jsonDecode(utf8.decode(response.bodyBytes));
-    return json["result"]["finCount"];
+      final List<StorySub> storylist =
+          json.map<StorySub>((js) => StorySub.fromJson(js)).toList();
+      print("hi");
+      return storylist;
+    } else {
+      throw Exception();
+    }
   }
 
   @override
@@ -119,7 +115,7 @@ class MomentInfo extends StatelessWidget {
       _title(),
       Container(
           height: MediaQuery.of(context).size.height * 0.4,
-          child: FutureBuilder<List<Map<String, dynamic>>>(
+          child: FutureBuilder<List<StorySub>>(
               future: _getMoment(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
@@ -127,18 +123,29 @@ class MomentInfo extends StatelessWidget {
                 } else if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator());
                 } else {
-                  List<Map<String, dynamic>> list = snapshot.data!;
                   return ListView.builder(
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
-                      itemCount: list.length,
+                      itemCount: snapshot.data!.length,
                       itemBuilder: (BuildContext context, int index) => _moment(
                           MediaQuery.of(context).size,
                           index,
-                          list.length,
-                          list[index]));
+                          snapshot.data!.length,
+                          snapshot.data![index]));
                 }
               }))
     ]);
+  }
+}
+
+class StorySub {
+  late String title;
+  late String image_url;
+  late DateTime time;
+  StorySub(this.title, this.image_url, this.time) {}
+
+  factory StorySub.fromJson(Map<String, dynamic> parsedJson) {
+    return StorySub(parsedJson["title"], parsedJson["image_url"],
+        DateTime.parse(parsedJson["updated_at"]));
   }
 }
