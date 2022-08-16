@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../constants/token_temp_file.dart' as Token;
 
 class MmntApiService {
   Dio? _dio;
@@ -24,9 +25,11 @@ class MmntApiService {
       connectTimeout: 45 * 1000,
       receiveTimeout: 45 * 1000,
       // baseUrl: 'https://maps.googleapis.com/maps/api/place/',
-      baseUrl: 'https://dev.mmnt.link/moment',
+      baseUrl: 'https://dev.mmnt.link',
       contentType: 'application/json',
+      headers: {'Authorization':'Bearer ${Token.jwt_token}'},
     );
+
     mDio.options = baseOption;
 
     final mInterceptorsWrapper =
