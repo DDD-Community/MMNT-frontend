@@ -1,36 +1,37 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:dash_mement/constants/file_constants.dart';
-import 'package:dash_mement/domain/story.dart';
+import 'package:dash_mement/models/moment_model.dart';
 import 'package:dash_mement/providers/app_provider.dart';
 import 'package:dash_mement/providers/map_provider.dart';
-import 'package:dash_mement/utils/permission_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart' as Lottie;
 import 'package:provider/provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../apis/api_manager.dart';
 import '../constants/api_constants.dart';
-import '../constants/key_constants.dart';
 import '../constants/style_constants.dart';
 import 'package:http/http.dart' as http;
-
-import '../domain/error_model.dart';
-import '../domain/pharmacy_details_model.dart';
-import '../location/location_manager.dart';
-import '../providers/info_window_provider.dart';
+import '../domain/story.dart';
+import '../models/error_model.dart';
+import '../models/pin_model.dart';
+import '../providers/pushstory_provider.dart';
+import '../providers/sliidng_panel_provider.dart';
+import '../providers/storylist_provider.dart';
+import '../showstory/show_story.dart';
+import '../showstory/show_story_arguments.dart';
+import '../constants/token_temp_file.dart' as Token;
 
 class MapScreen extends StatefulWidget {
   @override
@@ -39,48 +40,47 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   final PanelController _pc = PanelController();
-  late GoogleMapController _mapController;
-  late String _mapStyle;
-  Set<Marker> _showMarkers = {};
+  final Set<Marker> _showMarkers = {};
   final double _initFabHeight = 60.h;
-  double _fabHeight = 0;
-  double _panelHeightOpen = 284.h;
-  double _panelHeightClosed = 50.h;
-
-  late Position currentPosition;
-  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-  int markerSizeMedium = Platform.isIOS ? 65 : 45;
+  final double _panelHeightOpen = 284.h;
+  final double _panelHeightClosed = 50.h;
+  final int _markerSizeMedium = Platform.isIOS ? 65 : 45;
   final GlobalKey? _keyGoogleMap = GlobalKey();
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.532600, 127.024612),
-    zoom: 14.4746,
-  );
-
-  double _currentZoom = 14.4746;
-  late BitmapDescriptor _momentMarker;
-  late BitmapDescriptor _pharmacyMarker;
-  late BitmapDescriptor _farPharmacyMarker;
-
-  List<Story> _stories = [];
-  List<LatLng> _pins = [];
-
-  List<LatLng> _nearestPharmacies = [];
-  PharmacyDetailsModel? _pharmacyDetailsModel;
-  List<PharmacyDetailsModel> _pharmacies = [];
-
+  final List<PinModel> _pins = [];
   bool _isCameraReCenter = false;
-  int _minClusterZoom = 0;
-  int _maxClusterZoom = 19;
+
+  late double _fabHeight = 0;
+  late String _mapStyle;
+  late GoogleMapController _mapController;
+  late Position currentPosition;
+  late BitmapDescriptor _momentMarker;
+
+  // Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  // static const CameraPosition _kGooglePlex = CameraPosition(
+  //   target: LatLng(37.532600, 127.024612),
+  //   zoom: 14.4746,
+  // );
+  // double _currentZoom = 14.4746;
+  // late BitmapDescriptor _pharmacyMarker;
+  // late BitmapDescriptor _farPharmacyMarker;
+  // List<Story> _stories = [];
+
+  // final List<LatLng> _nearestPharmacies = [];
+  // PharmacyDetailsModel? _pharmacyDetailsModel;
+  // List<PharmacyDetailsModel> _pharmacies = [];
+
+  // int _minClusterZoom = 0;
+  // int _maxClusterZoom = 19;
 
   @override
   void initState() {
     super.initState();
     _initialiseMarkerBitmap(context);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
-      Provider.of<InfoWindowProvider>(context, listen: false)
-          .updateWidth(MediaQuery.of(context).size.width);
-      Provider.of<InfoWindowProvider>(context, listen: false)
-          .updateHeight(_getMapHeight());
+      // Provider.of<SlidingPanelProvider>(context, listen: false)
+      //     .updateWidth(MediaQuery.of(context).size.width);
+      // Provider.of<SlidingPanelProvider>(context, listen: false)
+      //     .updateHeight(_getMapHeight());
       rootBundle.loadString(FileConstants.mapStyle).then((string) {
         _mapStyle = string;
       });
@@ -155,19 +155,46 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _getUserLocation(BuildContext context) async {
-    context.read<AppProvider>().updateAppState(AppStatus.loading);
+    LocationPermission permission = await Geolocator.requestPermission();
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
 
-    PermissionUtils?.requestPermission(Permission.location, context,
-        isOpenSettings: true, permissionGrant: () async {
-      await LocationService().fetchCurrentLocation(context, _getPinsList,
-          updatePosition: updateCameraPosition);
-    }, permissionDenied: () {
-      Fluttertoast.showToast(
-          backgroundColor: Colors.blue,
-          msg:
-              "Please grant the required permission from settings to access this feature.");
-    });
-    context.read<AppProvider>().updateAppState(AppStatus.loaded);
+    currentPosition = position;
+    LatLng latlngPosition = LatLng(position.latitude, position.longitude);
+    String newAddress = await _getAddress(
+        position.latitude!.toDouble(), position.longitude!.toDouble());
+
+    Provider.of<MapProvider>(context, listen: false)
+        .updateCurrentAddress(newAddress);
+    Provider.of<MapProvider>(context, listen: false)
+        .updateCurrentLocation(latlngPosition);
+    PushStoryProvider pushStory =
+        Provider.of<PushStoryProvider>(context, listen: false);
+    pushStory.latitude_y = position.latitude!.toDouble();
+    pushStory.longitude_x = position.longitude!.toDouble();
+
+    _getPinsList(context, latlngPosition);
+
+    // await LocationService().fetchCurrentLocation(context, _getPinsList,
+    //     updatePosition: updateCameraPosition);
+    // LatLng latlngPosition = LatLng(position.latitude, position.longitude);
+    // CameraPosition cameraPosition =
+    //     new CameraPosition(target: latlngPosition, zoom: 14);
+    // _mapController
+    //     .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+    //
+    // PermissionUtils?.requestPermission(Permission.location, context,
+    //     isOpenSettings: true, permissionGrant: () async {
+    //   await LocationService().fetchCurrentLocation(context, _getPinsList,
+    //       updatePosition: updateCameraPosition);
+    // }, permissionDenied: () {
+    //   Fluttertoast.showToast(
+    //       backgroundColor: Colors.blue,
+    //       msg:
+    //           "Please grant the required permission from settings to access this feature.");
+    // });
+    // context.read<AppProvider>().updateAppState(AppStatus.loaded);
   }
 
   void updateCameraPosition(CameraPosition cameraPosition) {
@@ -177,14 +204,14 @@ class _MapScreenState extends State<MapScreen> {
 
   _initialiseMarkerBitmap(BuildContext context) async {
     await _bitmapDescriptorFromSvgAsset(
-            context, FileConstants.icMomentPin, markerSizeMedium)
+            context, FileConstants.icMomentPin, _markerSizeMedium)
         .then((value) => _momentMarker = value);
-    await _bitmapDescriptorFromSvgAsset(
-            context, FileConstants.icPharmacyMarker, markerSizeMedium)
-        .then((value) => _pharmacyMarker = value);
-    await _bitmapDescriptorFromSvgAsset(
-            context, FileConstants.icFarPharmacyMarker, markerSizeMedium)
-        .then((value) => _farPharmacyMarker = value);
+    // await _bitmapDescriptorFromSvgAsset(
+    //         context, FileConstants.icPharmacyMarker, _markerSizeMedium)
+    //     .then((value) => _pharmacyMarker = value);
+    // await _bitmapDescriptorFromSvgAsset(
+    //         context, FileConstants.icFarPharmacyMarker, _markerSizeMedium)
+    //     .then((value) => _farPharmacyMarker = value);
   }
 
   Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
@@ -198,107 +225,130 @@ class _MapScreenState extends State<MapScreen> {
     return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
-  void _getPinsList() async {
-    ApiManager().getPins(ApiConstants.getPins(), context).then((value) {
+  void _getPinsList(BuildContext context, LatLng latlngPosition) async {
+    Provider.of<AppProvider>(context, listen: false)
+        .updateAppState(AppStatus.loading);
+
+    ApiManager()
+        .getPins(context, ApiConstants.getPins(), latlngPosition)
+        .then((value) {
       setState(() {
         _pins.clear();
 
-        _pharmacies.clear();
+        // _pharmacies.clear();
         value.data['result'][0]['pinLists'].forEach((element) {
-          _pins.add(LatLng(
-            double.parse(element['pin_y']!),
-            double.parse(element['pin_x']!),
+          _pins.add(PinModel(
+            id: element['pin_idx']!,
+            latitude_y: element['pin_y']!,
+            longitude_x: element['pin_x']!,
           ));
-          // _stories.add(
-          //     Story(
+          //     LatLng(
+          //   double.parse(element['pin_y']!),
+          //   double.parse(element['pin_x']!),
+          // )
         });
+
+        MomentModel mainMoment =
+            MomentModel.fromJson(value.data['result'][1]['mainPin']);
+        Provider.of<MapProvider>(context, listen: false)
+            .updateMainMoment(mainMoment);
       });
-      _setMarkerUi();
+      _setMarkerUi(context, latlngPosition);
     }).catchError((e) {
       if (e is ErrorModel) {
         debugPrint("${e.response}");
       }
+      Fluttertoast.showToast(
+          backgroundColor: Colors.blue, msg: "${e.response}");
     });
   }
 
-  void _getPlaceList() async {
-    ApiManager()
-        .getPlaces(
-            ApiConstants.getPlaces(
-                Provider.of<MapProvider>(context, listen: false).currentLatLng!,
-                "AIzaSyCVeSxT9CRICi1ly2W3XUXFmmpZwRplXQQ"),
-            context)
-        .then((value) {
-      setState(() {
-        _nearestPharmacies.clear();
-        _pharmacies.clear();
-        value.data[KeyConstants.resultsKey].forEach((element) {
-          _nearestPharmacies.add(LatLng(
-              element[KeyConstants.geometryKey][KeyConstants.locationKey]
-                      [KeyConstants.latKey]
-                  .toDouble(),
-              element[KeyConstants.geometryKey][KeyConstants.locationKey]
-                      [KeyConstants.lngKey]
-                  .toDouble()));
-          _pharmacies.add(PharmacyDetailsModel(
-              icon: element[KeyConstants.iconKey].toString(),
-              iconBackgroundColor:
-                  element[KeyConstants.iconBackgroundColorKey].toString(),
-              placeId: element[KeyConstants.placeIdKey].toString(),
-              name: element[KeyConstants.nameKey].toString(),
-              vicinity: element[KeyConstants.vicinityKey].toString(),
-              geometry: Geometry(
-                  location: Location(
-                      lat: element[KeyConstants.geometryKey]
-                          [KeyConstants.locationKey][KeyConstants.latKey],
-                      lng: element[KeyConstants.geometryKey]
-                          [KeyConstants.locationKey][KeyConstants.lngKey]),
-                  viewport: ViewPort(
-                      northeast: Location(lat: 0.0, lng: 0.0),
-                      southwest: Location(lat: 0.0, lng: 0.0))),
-              distance: 0.00,
-              rating: element[KeyConstants.ratingKey] != null
-                  ? element[KeyConstants.ratingKey].toDouble()
-                  : 0.00,
-              openingHours: element[KeyConstants.openingHoursKey] != null
-                  ? OpeningHours(openNow: element[KeyConstants.openingHoursKey][KeyConstants.openNowKey])
-                  : OpeningHours(openNow: false)));
-        });
-      });
-      _setMarkerUiforPlaces();
-      // _setMarkerUi();
-    }).catchError((e) {
-      if (e is ErrorModel) {
-        debugPrint("${e.response}");
-      }
-    });
-  }
+  // void _getPlaceList() async {
+  //   ApiManager()
+  //       .getPlaces(
+  //           ApiConstants.getPlaces(
+  //               Provider.of<MapProvider>(context, listen: false).currentLatLng!,
+  //               "AIzaSyCVeSxT9CRICi1ly2W3XUXFmmpZwRplXQQ"),
+  //           context)
+  //       .then((value) {
+  //     setState(() {
+  //       _nearestPharmacies.clear();
+  //       _pharmacies.clear();
+  //       value.data[KeyConstants.resultsKey].forEach((element) {
+  //         _nearestPharmacies.add(LatLng(
+  //             element[KeyConstants.geometryKey][KeyConstants.locationKey]
+  //                     [KeyConstants.latKey]
+  //                 .toDouble(),
+  //             element[KeyConstants.geometryKey][KeyConstants.locationKey]
+  //                     [KeyConstants.lngKey]
+  //                 .toDouble()));
+  //         _pharmacies.add(PharmacyDetailsModel(
+  //             icon: element[KeyConstants.iconKey].toString(),
+  //             iconBackgroundColor:
+  //                 element[KeyConstants.iconBackgroundColorKey].toString(),
+  //             placeId: element[KeyConstants.placeIdKey].toString(),
+  //             name: element[KeyConstants.nameKey].toString(),
+  //             vicinity: element[KeyConstants.vicinityKey].toString(),
+  //             geometry: Geometry(
+  //                 location: Location(
+  //                     lat: element[KeyConstants.geometryKey]
+  //                         [KeyConstants.locationKey][KeyConstants.latKey],
+  //                     lng: element[KeyConstants.geometryKey]
+  //                         [KeyConstants.locationKey][KeyConstants.lngKey]),
+  //                 viewport: ViewPort(
+  //                     northeast: Location(lat: 0.0, lng: 0.0),
+  //                     southwest: Location(lat: 0.0, lng: 0.0))),
+  //             distance: 0.00,
+  //             rating: element[KeyConstants.ratingKey] != null
+  //                 ? element[KeyConstants.ratingKey].toDouble()
+  //                 : 0.00,
+  //             openingHours: element[KeyConstants.openingHoursKey] != null
+  //                 ? OpeningHours(openNow: element[KeyConstants.openingHoursKey][KeyConstants.openNowKey])
+  //                 : OpeningHours(openNow: false)));
+  //       });
+  //     });
+  //     _setMarkerUiforPlaces();
+  //     // _setMarkerUi();
+  //   }).catchError((e) {
+  //     if (e is ErrorModel) {
+  //       debugPrint("${e.response}");
+  //     }
+  //   });
+  // }
+  //
+  // void _setMarkerUiforPlaces() async {
+  //   List<Marker> _generatedMapMarkers = [];
+  //   // var i = 0;
+  //
+  //   _nearestPharmacies.forEach((element) {
+  //     // i++;
+  //     _generatedMapMarkers.add(
+  //       Marker(
+  //           markerId: MarkerId(element.hashCode.toString()),
+  //           icon: _momentMarker,
+  //           position: LatLng(element.latitude, element.longitude),
+  //           onTap: () {
+  //             _pc.open();
+  //
+  //
+  //           }),
+  //     );
+  //   });
+  //   setState(() {
+  //     _showMarkers.clear();
+  //     _showMarkers.addAll(_generatedMapMarkers);
+  //   });
+  //   _mapController.animateCamera(
+  //       CameraUpdate.newLatLngBounds(_getBounds(_nearestPharmacies), 50));
+  //
+  //
+  //   // context.read<AppProvider>().updateAppState(AppStatus.loaded);
+  //   Future.delayed(const Duration(seconds: 3), _pc.open);
+  // }
 
-  void _setMarkerUiforPlaces() async {
-    List<Marker> _generatedMapMarkers = [];
-    // var i = 0;
-
-    _nearestPharmacies.forEach((element) {
-      // i++;
-      _generatedMapMarkers.add(
-        Marker(
-            markerId: MarkerId(element.hashCode.toString()),
-            icon: _momentMarker,
-            position: LatLng(element.latitude, element.longitude),
-            onTap: _pc.open),
-      );
-    });
-    setState(() {
-      _showMarkers.clear();
-      _showMarkers.addAll(_generatedMapMarkers);
-    });
-    _mapController.animateCamera(
-        CameraUpdate.newLatLngBounds(_getBounds(_nearestPharmacies), 50));
-
-    Future.delayed(const Duration(seconds: 3), _pc.open);
-  }
-
-  void _setMarkerUi() async {
+  void _setMarkerUi(BuildContext context, LatLng latlngPosition) async {
+    // context.watch<AppProvider>().updateAppState(AppStatus.loading);
+    MapProvider mapProvider = Provider.of<MapProvider>(context, listen: false);
     List<Marker> _generatedMapMarkers = [];
     // var i = 0;
     _pins.forEach((element) {
@@ -308,23 +358,39 @@ class _MapScreenState extends State<MapScreen> {
             markerId: MarkerId(element.hashCode.toString()),
             icon: _momentMarker,
             // icon: markerbitmap,
-            position: LatLng(element.latitude, element.longitude),
-            onTap: _pc.open),
+            position: LatLng(double.parse(element.latitude_y), double.parse(element.longitude_x)),
+            onTap: () {
+              _push(context, element);
+              // _pc.open
+            }),
       );
     });
+    List<LatLng> _pinBound = _pins.map((element) {
+      return LatLng(double.parse(element.latitude_y), double.parse(element.longitude_x));
+    }).toList();
+    Provider.of<AppProvider>(context, listen: false)
+        .updateAppState(AppStatus.loaded);
+
     setState(() {
       _showMarkers.clear();
       _showMarkers.addAll(_generatedMapMarkers);
     });
 
-    if(_pins.isEmpty) {
-      // todoL zoom
-    } else {
+    if (_pins.isEmpty) {
+      CameraPosition cameraPosition =
+          new CameraPosition(target: latlngPosition, zoom: 14);
       _mapController
-          .animateCamera(CameraUpdate.newLatLngBounds(_getBounds(_pins), 50));
+          .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    } else {
+      _mapController.animateCamera(
+          CameraUpdate.newLatLngBounds(_getBounds(_pinBound), 50));
     }
 
     Future.delayed(const Duration(seconds: 3), _pc.open);
+    _mapController
+        .animateCamera(CameraUpdate.newLatLngBounds(_getBounds(_pinBound), 50));
+
+    Future.delayed(const Duration(seconds: 2), _pc.open);
   }
 
   LatLngBounds _getBounds(List<LatLng> markerLocations) {
@@ -375,6 +441,8 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<AppProvider>();
+
     BorderRadiusGeometry slidingPanelRadius = const BorderRadius.only(
       topLeft: Radius.circular(24.0),
       topRight: Radius.circular(24.0),
@@ -397,7 +465,7 @@ class _MapScreenState extends State<MapScreen> {
                   _initFabHeight;
             }),
             body: SafeArea(
-              child: Scaffold(body: Consumer<InfoWindowProvider>(
+              child: Scaffold(body: Consumer<SlidingPanelProvider>(
                 builder: (BuildContext contex, infoWindowProvider, __) {
                   final GlobalKey<ScaffoldState> _scaffoldKey =
                       GlobalKey<ScaffoldState>();
@@ -503,10 +571,10 @@ class _MapScreenState extends State<MapScreen> {
                   height: 42.h,
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child:
-                      _showMarkers.isEmpty ? DummyMainMoment() : NoPinMoment(),
-                ),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: _showMarkers.isEmpty
+                        ? const NoPinMoment()
+                        : const MainMoment()),
               ],
             ),
           ),
@@ -528,6 +596,7 @@ class _MapScreenState extends State<MapScreen> {
                       color: Colors.black,
                     ),
                     onPressed: () {
+                      HapticFeedback.mediumImpact();
                       _pc.close();
                       _getUserLocation(context);
                     },
@@ -558,7 +627,8 @@ class _MapScreenState extends State<MapScreen> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        // _add();
+                        HapticFeedback.mediumImpact();
+                        Navigator.pushNamed(context, '/pin-create-screen');
                       }),
                 ),
                 SizedBox(
@@ -571,26 +641,32 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
           ),
+
+          state.appStatus == AppStatus.loading
+              ? const Center(child: CircularProgressIndicator())
+              : Container(),
         ],
       ),
     );
   }
 }
 
-class DummyMainMoment extends StatelessWidget {
-  const DummyMainMoment({
+class MainMoment extends StatelessWidget {
+  const MainMoment({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final state = Provider.of<MapProvider>(context);
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              '여기 완전 노을 맛집',
+              state.mainMoment.title,
               style: kWhiteBold20,
             ),
           ],
@@ -612,11 +688,11 @@ class DummyMainMoment extends StatelessWidget {
                   Column(
                     children: [
                       Text(
-                        'Dar+ling',
+                        state.mainMoment.title,
                         style: kGrayBold18.copyWith(color: Colors.white),
                       ),
                       Text(
-                        'SEVENTEEN',
+                        state.mainMoment.artist,
                         style: kGray12,
                       ),
                     ],
@@ -634,7 +710,17 @@ class DummyMainMoment extends StatelessWidget {
                 child: const Text(
                   '지금 이곳에 기록된 모먼트 보기',
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  // Provider.of<StoryListProvider>(context, listen: false).getStoryList(context, state.mainMoment.pin_idx);
+                  Navigator.pushNamed(
+                    context,
+                    ShowStory.routeName,
+                    arguments: ShowStoryArguments(
+                        'https://youtu.be/oxs3K8SPXpI',
+                        state.currentLatLng!.latitude,
+                        state.currentLatLng!.longitude),
+                  );
+                },
               ),
             ],
           ),
@@ -663,8 +749,8 @@ class NoPinMoment extends StatelessWidget {
             SizedBox(
               height: 115.h,
               width: 115.w,
-              child: SvgPicture.asset(
-                'assets/svgs/no-pin.svg',
+              child: Image.asset(
+                'assets/images/no-pin.png',
               ),
             ),
             Text(
