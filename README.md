@@ -14,9 +14,11 @@ flutter run
 ### 구글맵
 안드로이드와 IOS 각각 API key값 입력
 ```
-// 안드로이드
-android/app/src/main/AndroidManifest.xml
+[안드로이드]
+path: /android/local.properties
+key: googleMapsApiKey=API-KEY
 
-// IOS
-ios/Runner/AppDelegate.swift
+[IOS]
+path: /ios/Flutter/Debug.xcconfig
+key: GOOGLE_MAPS_API_KEY=API-KEY
 ```
