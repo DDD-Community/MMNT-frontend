@@ -4,7 +4,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/style_constants.dart';
-import '../domain/error_model.dart';
+import '../models/error_model.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -51,13 +51,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void checkVerification() async {
     try {
-      var response =
-          await Dio().post('https://dev.mmnt.link/auth/verification', data: {
-        'email': emailController.text.trim(),
-        'value': verificationController.text.trim()
-      });
+      Map<String, dynamic> map = {
+        "email": emailController.text.trim(),
+        "value": verificationController.text.trim()
+      };
 
-      print(response);
+      var response =
+          await Dio().post('https://dev.mmnt.link/auth/verification', data: map);
+
       if (response.data['isSuccess']) {
         setState(() {
           isVerificationMatch = true;
@@ -73,8 +74,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       var response = await Dio().post('https://dev.mmnt.link/user/sign-up',
           data: {
-            'email': emailController.text.trim(),
-            'value': passwordController.text.trim()
+            'email': emailController.text,
+            'value': passwordController.text
           });
 
       print(response);
@@ -180,6 +181,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter some text';
                           }
+
+                          // RegExp regex = RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{10,}$');
+                          // if(!regex.hasMatch(value)){
+                          //   return '특수문자, 대소문자, 숫자 포함 10자 이상 입력하세요.';
+                          // }
+
+                          return null;
+
                           if (passwordController.text != passwordCheckController.text) {
                             return '비밀번호가 일치하지 않습니다';
                           }
@@ -220,10 +229,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         '회원가입',
                       ),
                       onPressed: () {
-                        if (!isVerificationMatch) {
-                          errorDialog(context, '인증 후 회원가입 가능합니다');
-                          return;
-                        }
+                        // if (!isVerificationMatch) {
+                        //   errorDialog(context, '인증 후 회원가입 가능합니다');
+                        //   return;
+                        // }
 
                         if (_formKey.currentState!.validate()) {
                           postSignup();

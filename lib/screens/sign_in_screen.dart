@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../component/error_dialog.dart';
-import '../domain/error_model.dart';
+import '../models/error_model.dart';
 import '../constants/token_temp_file.dart' as Token;
 
 class SignInScreen extends StatefulWidget {
@@ -30,7 +30,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void postSignin() async {
     try {
-      var response = await Dio().post('https://dev.mmnt.link/user/sign-in', data: {'email': emailController.text.trim(), 'password': passwordController.text.trim()});
+      Map<String, dynamic> map = {
+        "email": emailController.text,
+        "password": passwordController.text,
+      };
+
+      var response = await Dio().post('https://dev.mmnt.link/user/sign-in', data: map);
 
       if(response.data['isSuccess']) {
         // TODO shared preference로 토큰 관리
@@ -96,8 +101,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 TextFormField(
                   obscureText: true,
-                  enableSuggestions: false,
-                  autocorrect: false,
+                  // enableSuggestions: false,
+                  // autocorrect: false,
                   controller: passwordController,
                   decoration: InputDecoration(
                       hintText: '비밀번호 (영문+숫자+특수문자 10자 이상)',
