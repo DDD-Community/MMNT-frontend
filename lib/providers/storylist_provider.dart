@@ -6,6 +6,11 @@ class StoryListProvider extends ChangeNotifier {
 
   StoryListProvider() {}
 
+  void clear() {
+    _storyList.clear();
+    notifyListeners();
+  }
+
   void add(Story story) {
     _storyList.add(story);
     notifyListeners();
