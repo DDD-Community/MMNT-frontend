@@ -89,11 +89,69 @@ class _MapScreenState extends State<MapScreen> {
     _fabHeight = _initFabHeight;
   }
 
-  _getMapHeight() {
-    RenderBox? renderBoxRed =
-        _keyGoogleMap?.currentContext?.findRenderObject() as RenderBox?;
-    final size = renderBoxRed?.size;
-    return size?.height;
+  // _getMapHeight() {
+  //   RenderBox? renderBoxRed =
+  //       _keyGoogleMap?.currentContext?.findRenderObject() as RenderBox?;
+  //   final size = renderBoxRed?.size;
+  //   return size?.height;
+  // }
+
+  void _push(BuildContext context, PinModel pinModel) async {
+    StoryListProvider storyListProvider = Provider.of<StoryListProvider>(context, listen: false);
+    storyListProvider.clear();
+    MapProvider mapProvider = Provider.of<MapProvider>(context, listen: false);
+    Provider.of<PushStoryProvider>(context, listen: false)
+        .setLatLng(double.parse(pinModel.latitude_y), double.parse(pinModel.longitude_x));
+
+    List<Story> storyList = await _getMomentList(pinModel.id);
+    if (storyList != null) {
+      storyList.forEach((element) => storyListProvider.add(element));
+      Navigator.pushNamed(context, ShowStory.routeName,
+          arguments: ShowStoryArguments(
+              storyList[0].link,
+              mapProvider.currentLatLng!.latitude,
+              mapProvider.currentLatLng!.longitude));
+    } else {}
+  }
+
+  Future<List<Story>> _getMomentList(String currentPinIndex) async {
+    // final token =
+    //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE0IiwiZW1haWwiOiJwcmFjb25maUBuYXZlci5jb20iLCJpYXQiOjE2NjAxODAzMTIsImV4cCI6MTY2MTM4OTkxMn0.JFyfKkE7udj5IAAXttGOmRK-_bbRdY4vENypAsjZ1Qg";
+
+    final url = Uri.parse(
+        "https://dev.mmnt.link/moment/pin/$currentPinIndex?page=1&limit=4");
+    final response = await http.get(url, headers: {
+      "accept": "application/json; charset=utf-8",
+      "Authorization": "Bearer ${Token.jwt_token}",
+    });
+
+    if (response.statusCode == 200) {
+      List<dynamic> json = jsonDecode(response.body)["result"];
+
+      final List<Story> list =
+          json.map<Story>((js) => Story.fromJson(js)).toList();
+
+      return list;
+    } else {
+      print(response.statusCode.toString());
+      throw Exception;
+    }
+  }
+
+  // TODO 위치 수정 필요
+  Future<String> _getAddress(double lat, double lng) async {
+    String? API_KEY = dotenv.env["TMAP_KEY"];
+    final url_main = Uri.parse(
+        "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A03&newAddressExtend=Y");
+    final url_building = Uri.parse(
+        "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=$lat&lon=$lng&coordType=WGS84GEO&addressType=A04&newAddressExtend=Y");
+    final response_main = await http.get(url_main,
+        headers: {"Accept": "aplication/json", "appKey": API_KEY!});
+    final response_building = await http.get(url_building,
+        headers: {"Accept": "aplication/json", "appKey": API_KEY});
+
+    // 도로명 + 건물 번호
+    return "${jsonDecode(response_main.body)["addressInfo"]['fullAddress']} ${jsonDecode(response_building.body)["addressInfo"]["buildingIndex"]}";
   }
 
   Future<void> _getUserLocation(BuildContext context) async {
