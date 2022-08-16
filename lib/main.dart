@@ -3,6 +3,7 @@ import 'package:dash_mement/providers/app_provider.dart';
 import 'package:dash_mement/poststory/post_image.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
+import 'package:dash_mement/screens/pin_create_screen.dart';
 import 'package:dash_mement/screens/map_screen.dart';
 import 'package:dash_mement/screens/sign_in_screen.dart';
 import 'package:dash_mement/screens/sign_up_screen.dart';
@@ -15,7 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'constants/style_constants.dart';
-import 'providers/info_window_provider.dart';
+import 'providers/sliidng_panel_provider.dart';
 import 'providers/storylist_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/permission_screen.dart';
@@ -79,7 +80,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => MapProvider()),
-        ChangeNotifierProvider(create: (_) => InfoWindowProvider()),
+        ChangeNotifierProvider(create: (_) => SlidingPanelProvider()),
         ChangeNotifierProvider(create: (_) => StoryListProvider()),
         ChangeNotifierProvider(create: (_) => PushStoryProvider())
       ],
@@ -136,7 +137,7 @@ class _MyAppState extends State<MyApp> {
                               borderSide: BorderSide(
                                   color: kTextFormFieldUnderlineColor,
                                   width: 1.5)))),
-                  initialRoute: '/map-screen',
+                  initialRoute: '/',
                   routes: {
                     '/': (context) => const LoginScreen(),
                     '/sign-up-screen': (context) => const SignUpScreen(),
@@ -146,7 +147,8 @@ class _MyAppState extends State<MyApp> {
                         ModalRoute.of(context)!.settings.arguments
                             as ShowStoryArguments),
                     '/test-screen': (context) => TestScreen(),
-                    '/user-page-screen': (context) => UserPage()
+                    '/user-page-screen': (context) => UserPage(),
+                    '/pin-create-screen': (context) => PinCreateScreen(),
 
                   },
                 );
