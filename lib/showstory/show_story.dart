@@ -55,7 +55,9 @@ class _ShowStory extends State<ShowStory> {
         context, MaterialPageRoute(builder: (_) => PostImage(_backFromChild)));
   }
 
-  void _backButton() {}
+  void _backButton() {
+    Navigator.of(context).pop();
+  }
 
   //youtube 재생 기능(차일드가 꺼지면...)
   void _backFromChild() {
