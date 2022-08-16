@@ -2,6 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+enum PostMode {
+  pin,
+  moment,
+}
+
 class PushStoryProvider extends ChangeNotifier {
   String? _title = "";
   late String? _user;
@@ -13,6 +18,7 @@ class PushStoryProvider extends ChangeNotifier {
   late String? _artist;
   late double? _lat_y;
   late double? _lng_x;
+  late PostMode _postMode;
 
   PushStoryProvider() {}
 
@@ -26,6 +32,7 @@ class PushStoryProvider extends ChangeNotifier {
   String? get artist => _artist;
   double? get latitude_y => _lat_y;
   double? get longitude_x => _lng_x;
+  PostMode get postMode => _postMode;
 
   void clear() {
     _title = "";
@@ -88,6 +95,17 @@ class PushStoryProvider extends ChangeNotifier {
 
   set longitude_x(double? value) {
     _lng_x = value;
+    ChangeNotifier();
+  }
+
+  set postMode(PostMode value) {
+    _postMode = value;
+    ChangeNotifier();
+  }
+
+  void setLatLng(double lat, double lng) {
+    _lat_y = lat;
+    _lng_x = lng;
     ChangeNotifier();
   }
 }
