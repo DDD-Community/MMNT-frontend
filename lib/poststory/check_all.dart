@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/component/toast/mmnterror_toast.dart';
 import 'package:dash_mement/domain/story.dart';
@@ -14,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../constants/token_temp_file.dart' as Token;
 
 class CheckAll extends StatefulWidget {
   String _youtubeId;
@@ -65,7 +65,7 @@ class _CheckAll extends State<CheckAll> {
   }
 
   String _getCurrentUserToken() {
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NTc5OTcwMzMsImV4cCI6MTY1ODAwMDYzM30.PyDhlaAViCxtDLWBscJMW8w4ylyjQZpXfVldRoSdbn4";
+    return Token.jwt_token;
   }
 
   void _submit() async {
@@ -95,8 +95,12 @@ class _CheckAll extends State<CheckAll> {
             },
             body: body);
         print("flutter post test: ${response.body}");
-        _pushStoryProvider.clear();
-        Navigator.popUntil(context, ModalRoute.withName("/show-story-screen"));
+        // _pushStoryProvider.clear();
+        if(_pushStoryProvider.postMode == PostMode.moment) {
+          Navigator.popUntil(context, ModalRoute.withName("/show-story-screen"));
+        } else {
+          Navigator.popUntil(context, ModalRoute.withName("/map-screen"));
+        }
       } catch (e) {
         print("flutter_error: ${e.toString()}");
         _showToast("업로드 실패", 180);
@@ -173,7 +177,7 @@ class _CheckAll extends State<CheckAll> {
                           "", // img
                           _pushStoryProvider.context,
                           _pushStoryProvider.track!,
-                          _pushStoryProvider.artist!))
+                          _pushStoryProvider.artist!,),)
                 ])));
   }
 }

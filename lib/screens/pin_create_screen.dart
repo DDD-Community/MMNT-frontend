@@ -4,22 +4,18 @@ import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-class PostImage extends StatelessWidget {
+class PinCreateScreen extends StatelessWidget {
   Widget _inform = Image.asset("assets/images/check_image.png");
   final ImagePicker _picker = ImagePicker();
-  late Function _backButton;
-  double? lat_y;
-  double? lng_x;
+  // double? lat_y;
+  // double? lng_x;
 
-  PostImage(this._backButton) {}
+  PinCreateScreen();
 
-  PostImage.newPin({required double latitude_y, required double longitude_x}) {
-    lat_y = latitude_y;
-    lng_x = longitude_x;
-  }
 
   void _getImage(BuildContext context) async {
     // Pick an image
@@ -41,21 +37,16 @@ class PostImage extends StatelessWidget {
   }
 
   void _popWidget(BuildContext context) {
-    _backButton();
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
+
     Size _buttonSize = Size(MediaQuery.of(context).size.width * 0.9,
         MediaQuery.of(context).size.height * 0.075);
-
-      PushStoryProvider pushStory = Provider.of<PushStoryProvider>(context);
-      // pushStory.latitude_y = lat_y;
-      // pushStory.longitude_x = lng_x;
-      pushStory.postMode = PostMode.moment;
-
-
+    PushStoryProvider pushStory = Provider.of<PushStoryProvider>(context);
+    pushStory.postMode = PostMode.pin;
 
     return Scaffold(
         backgroundColor: MmntStyle().mainBlack,
@@ -75,8 +66,8 @@ class PostImage extends StatelessWidget {
         body: Column(children: [
           Expanded(
               child: Container(
-            child: _inform,
-          )),
+                child: _inform,
+              )),
           Padding(
               padding: EdgeInsets.only(bottom: 12),
               child: ElevatedButton(
