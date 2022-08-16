@@ -12,8 +12,8 @@ enum AppStatus {
 class AppProvider with ChangeNotifier {
   AppStatus appStatus = AppStatus.initial;
 
-  void updateAppState(AppStatus newappStatus) {
-    appStatus = newappStatus;
+  void updateAppState(AppStatus status) {
+    appStatus = status;
     notifyListeners();
   }
 }
