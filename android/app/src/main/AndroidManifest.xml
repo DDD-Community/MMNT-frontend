@@ -2,7 +2,7 @@
     package="com.dash.dash_mement">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="dash_mement"
+        android:label="MMNT"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <!--  google map     -->
