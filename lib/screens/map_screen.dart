@@ -452,6 +452,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppProvider>();
+    final MapProvider mapProvider = context.watch<MapProvider>();
 
     BorderRadiusGeometry slidingPanelRadius = const BorderRadius.only(
       topLeft: Radius.circular(24.0),
@@ -584,8 +585,77 @@ class _MapScreenState extends State<MapScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: _showMarkers.isEmpty
                         ? const NoPinMoment()
-                        : const MainMoment()),
-              ],
+                        : Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              mapProvider.mainMoment.title,
+                              style: kWhiteBold20,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 16.h,
+                        ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 16.h),
+                          height: 160.h,
+                          width: 335.w,
+                          color: Color(0xff1E1E21),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(
+                                        mapProvider.mainMoment.title,
+                                        style: kGrayBold18.copyWith(color: Colors.white),
+                                      ),
+                                      Text(
+                                        mapProvider.mainMoment.artist,
+                                        style: kGray12,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                      width: 40,
+                                      height: 40,
+                                      child: Lottie.Lottie.asset("assets/json/equalizer.json"))
+                                ],
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size.fromHeight(50),
+                                ),
+                                child: const Text(
+                                  '지금 이곳에 기록된 모먼트 보기',
+                                ),
+                                onPressed: () {
+                                  // Provider.of<StoryListProvider>(context, listen: false).getStoryList(context, state.mainMoment.pin_idx);
+                                  // Navigator.pushNamed(
+                                  //   context,
+                                  //   ShowStory.routeName,
+                                  //   arguments: ShowStoryArguments(
+                                  //       'https://youtu.be/oxs3K8SPXpI',
+                                  //       state.currentLatLng!.latitude,
+                                  //       state.currentLatLng!.longitude),
+                                  // );
+                                  MomentModel mainMoment = Provider.of<MapProvider>(context, listen: false).mainMoment;
+                                  _push(context, PinModel(id: mapProvider.mainMoment.pin_idx, latitude_y: '37.50249550050011', longitude_x: '126.56762467261134'));
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                )],
+
             ),
           ),
           // the fab
