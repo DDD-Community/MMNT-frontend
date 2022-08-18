@@ -6,8 +6,7 @@ class Splash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0xff000000),
-        // backgroundColor: Colors.red,
-        body: Center(child: Image.asset('assets/gif/splash.gif')));
+      backgroundColor: const Color(0xFF1E5EFF),
+      body: Center(child: Image.asset('assets/gif/splash.gif')));
   }
 }
