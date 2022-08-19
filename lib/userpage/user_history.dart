@@ -244,11 +244,11 @@ class HistoryWidget extends StatefulWidget {
   const HistoryWidget(this._args, {Key? key}) : super(key: key);
 
   double getLngX() {
-    return this._args.story.longitude_x;
+    return this._args.story.lngX;
   }
 
   double getLatY() {
-    return this._args.story.latitude_y;
+    return this._args.story.latY;
   }
 
   String getMomentIdx() {

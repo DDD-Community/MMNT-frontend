@@ -102,7 +102,7 @@ class _MyAppState extends State<MyApp> {
                               borderSide: BorderSide(
                                   color: kTextFormFieldUnderlineColor,
                                   width: 1.5)))),
-                  initialRoute: '/user-page-screen',
+                  initialRoute: UserPage.routeName,
                   routes: {
                     '/': (context) => const LoginScreen(),
                     '/sign-up-screen': (context) => const SignUpScreen(),
