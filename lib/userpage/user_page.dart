@@ -5,6 +5,7 @@ import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 
 class UserPage extends StatelessWidget {
+  static const routeName = '/user-page-screen';
   void _backButton() {}
 
   @override

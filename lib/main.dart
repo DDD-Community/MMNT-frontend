@@ -9,6 +9,7 @@ import 'package:dash_mement/screens/sign_up_screen.dart';
 import 'package:dash_mement/showstory/show_story_arguments.dart';
 import 'package:dash_mement/showstory/show_story_test.dart';
 import 'package:dash_mement/showstory/testScreen.dart';
+import 'package:dash_mement/userpage/user_history.dart';
 import 'package:dash_mement/userpage/user_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -111,8 +112,9 @@ class _MyAppState extends State<MyApp> {
                         ModalRoute.of(context)!.settings.arguments
                             as ShowStoryArguments),
                     '/test-screen': (context) => TestScreen(),
-                    '/user-page-screen': (context) => UserPage(),
+                    UserPage.routeName: (context) => UserPage(),
                     ShowStoryTest.routeName: (context) => ShowStoryTest(),
+                    UserHistory.routeName: ((context) => UserHistory())
                   },
                 );
               },

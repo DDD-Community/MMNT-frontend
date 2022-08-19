@@ -1,4 +1,5 @@
 import 'package:dash_mement/domain/story.dart';
+import 'package:dash_mement/userpage/user_history.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -6,7 +7,7 @@ import 'package:http/http.dart' as http;
 class MomentInfo extends StatelessWidget {
   static const double _padding = 20;
 
-  Widget _title() {
+  Widget _title(BuildContext context) {
     return Padding(
         padding: EdgeInsets.fromLTRB(20, 14, 10, 20),
         child:
@@ -25,7 +26,8 @@ class MomentInfo extends StatelessWidget {
               Icons.arrow_forward_ios,
               size: 14,
             ),
-            onPressed: () => print("hi"),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                context, UserHistory.routeName, (_) => false),
           )
         ]));
   }
@@ -102,7 +104,6 @@ class MomentInfo extends StatelessWidget {
 
       final List<StorySub> storylist =
           json.map<StorySub>((js) => StorySub.fromJson(js)).toList();
-      print("hi");
       return storylist;
     } else {
       throw Exception();
@@ -112,7 +113,7 @@ class MomentInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      _title(),
+      _title(context),
       Container(
           height: MediaQuery.of(context).size.height * 0.4,
           child: FutureBuilder<List<StorySub>>(
