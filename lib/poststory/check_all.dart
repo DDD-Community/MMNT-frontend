@@ -163,21 +163,17 @@ class _CheckAll extends State<CheckAll> {
                     color: MmntStyle().mainBlack,
                   ),
                   ImageContainer.check(
-                    MediaQuery.of(context).size,
-                    _pushStoryProvider.path,
-                    Story(
-                        _pushStoryProvider.title!,
-                        _getCurrenttUser(), // user
-                        _pushStoryProvider.dateTime!,
-                        _pushStoryProvider.link!,
-                        "", // img
-                        _pushStoryProvider.context,
-                        _pushStoryProvider.track!,
-                        _pushStoryProvider.artist!,
-                        0, //null
-                        0, //null
-                        "0"), //null
-                  )
+                      MediaQuery.of(context).size,
+                      _pushStoryProvider.path,
+                      Story(
+                          _pushStoryProvider.title!,
+                          _getCurrenttUser(), // user
+                          _pushStoryProvider.dateTime!,
+                          _pushStoryProvider.link!,
+                          "", // img
+                          _pushStoryProvider.context,
+                          _pushStoryProvider.track!,
+                          _pushStoryProvider.artist!))
                 ])));
   }
 }

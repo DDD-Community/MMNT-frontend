@@ -7,22 +7,12 @@ class Story {
   late String _message;
   late String _trackName;
   late String _artist;
-  late double _lat_y;
-  late double _lng_x;
-  late String _momentIdx;
+  double _lat_y = 0;
+  double _lng_x = 0;
+  String _momentIdx = "";
 
-  Story(
-      this._title,
-      this._user,
-      this._dateTime,
-      this._youtubeLink,
-      this._img,
-      this._message,
-      this._trackName,
-      this._artist,
-      this._lat_y,
-      this._lng_x,
-      this._momentIdx);
+  Story(this._title, this._user, this._dateTime, this._youtubeLink, this._img,
+      this._message, this._trackName, this._artist);
 
   factory Story.fromJson(Map<String, dynamic> parsedJson) {
     return Story(
@@ -33,14 +23,11 @@ class Story {
         parsedJson["Moment_image_url"],
         parsedJson["Moment_description"],
         parsedJson["Moment_music"],
-        parsedJson["Moment_artist"],
-        0, //null
-        0, //null
-        "0"); //null
+        parsedJson["Moment_artist"]); //null
   }
 
   factory Story.fromJsonHistory(Map<String, dynamic> parsedJson) {
-    return Story(
+    Story _story = Story(
         parsedJson["title"],
         parsedJson["nickname"].toString().replaceAll('번째 익명이', ""),
         DateTime.parse(parsedJson["updated_at"]),
@@ -48,10 +35,12 @@ class Story {
         parsedJson["image_url"],
         parsedJson["description"],
         parsedJson["music"],
-        parsedJson["artist"],
-        double.parse(parsedJson["pin_y"]),
-        double.parse(parsedJson["pin_x"]),
-        parsedJson["moment_idx"]);
+        parsedJson["artist"]);
+
+    _story._lat_y = double.parse(parsedJson["pin_y"]);
+    _story._lng_x = double.parse(parsedJson["pin_x"]);
+    _story._momentIdx = parsedJson["moment_idx"];
+    return _story;
   }
 
   String get title => _title;
@@ -62,7 +51,19 @@ class Story {
   String get msg => _message;
   String get track => _trackName;
   String get artist => _artist;
-  double get latitude_y => _lat_y;
-  double get longitude_x => _lng_x;
+  double get latY => _lat_y;
+  double get lngX => _lng_x;
   String get momentIdx => _momentIdx;
+
+  void set latY(double latY) {
+    _lat_y = latY;
+  }
+
+  void set lngX(double lngX) {
+    _lat_y = lngX;
+  }
+
+  void set momentIdx(String momentIdx) {
+    _momentIdx = momentIdx;
+  }
 }
