@@ -3,11 +3,13 @@ import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../component/error_dialog.dart';
 import '../models/error_model.dart';
 import '../constants/token_temp_file.dart' as Token;
+import '../providers/app_provider.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -29,6 +31,8 @@ class _SignInScreenState extends State<SignInScreen> {
 
 
   void postSignin() async {
+    Provider.of<AppProvider>(context, listen: false)
+        .updateAppState(AppStatus.loading);
     try {
       Map<String, dynamic> map = {
         "email": emailController.text,
@@ -45,6 +49,9 @@ class _SignInScreenState extends State<SignInScreen> {
     } on DioError catch (error) {
       var errorMsg = ErrorModel.fromJson(error.response?.data);
       errorDialog(context, errorMsg.message.toString());
+    } finally {
+      Provider.of<AppProvider>(context, listen: false)
+          .updateAppState(AppStatus.loaded);
     }
   }
 
@@ -52,6 +59,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
+    AppProvider appProvider = Provider.of<AppProvider>(context);
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -120,9 +128,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size.fromHeight(50),
                           ),
-                          child: const Text(
-                            '로그인',
-                          ),
+                          child: appProvider.appStatus == AppStatus.loading ? const CircularProgressIndicator() : const Text('로그인'),
                           onPressed: () {
                             postSignin();
                           },
