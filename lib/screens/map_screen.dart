@@ -257,11 +257,12 @@ class _MapScreenState extends State<MapScreen> {
           //   double.parse(element['pin_x']!),
           // )
         });
+        if(value.data['result'][1]['mainPin'].isNotEmpty) {
 
-        MomentModel mainMoment =
-            MomentModel.fromJson(value.data['result'][1]['mainPin']);
-        Provider.of<MapProvider>(context, listen: false)
-            .updateMainMoment(mainMoment);
+          MomentModel mainMoment = MomentModel.fromJson(value.data['result'][1]['mainPin']);
+          Provider.of<MapProvider>(context, listen: false).updateMainMoment(mainMoment);
+
+        }
       });
       _setMarkerUi(context, latlngPosition);
     }).catchError((e) {
