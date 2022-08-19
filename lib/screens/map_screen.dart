@@ -645,8 +645,7 @@ class _MapScreenState extends State<MapScreen> {
                                   //       state.currentLatLng!.latitude,
                                   //       state.currentLatLng!.longitude),
                                   // );
-                                  MomentModel mainMoment = Provider.of<MapProvider>(context, listen: false).mainMoment;
-                                  _push(context, PinModel(id: mapProvider.mainMoment.pin_idx, latitude_y: '37.50249550050011', longitude_x: '126.56762467261134'));
+                                  _push(context, PinModel(id: mapProvider.mainMoment.pin_idx, latitude_y: mapProvider.mainMoment.latitude_y!, longitude_x: mapProvider.mainMoment.longitude_x!));
                                 },
                               ),
                             ],
