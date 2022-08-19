@@ -7,6 +7,9 @@ class MomentModel {
   final String music;
   final String artist;
   final double distance;
+  String? latitude_y;
+  String? longitude_x;
+
 
   MomentModel({
     required this.moment_idx,
@@ -25,6 +28,7 @@ class MomentModel {
     youtube_url = json['youtube_url'],
     music = json['music'],
     artist = json['artist'],
-    distance = json['distance'];
-
+    distance = json['distance'],
+    latitude_y = json['pin_y'],
+    longitude_x = json['pin_x'];
 }
