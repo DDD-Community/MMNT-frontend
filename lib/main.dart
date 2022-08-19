@@ -137,18 +137,17 @@ class _MyAppState extends State<MyApp> {
                               borderSide: BorderSide(
                                   color: kTextFormFieldUnderlineColor,
                                   width: 1.5)))),
-                  initialRoute: '/',
+                  initialRoute: LoginScreen.routeName,
                   routes: {
-                    '/': (context) => const LoginScreen(),
-                    '/sign-up-screen': (context) => const SignUpScreen(),
-                    '/sign-in-screen': (context) => const SignInScreen(),
-                    '/map-screen': (context) => MapScreen(),
+                    LoginScreen.routeName: (context) => const LoginScreen(),
+                    SignUpScreen.routeName: (context) => const SignUpScreen(),
+                    SignInScreen.routeName: (context) => const SignInScreen(),
+                    MapScreen.routeName: (context) => MapScreen(),
                     ShowStory.routeName: (context) => ShowStory(
                         ModalRoute.of(context)!.settings.arguments
                             as ShowStoryArguments),
-                    '/test-screen': (context) => TestScreen(),
                     '/user-page-screen': (context) => UserPage(),
-                    '/pin-create-screen': (context) => PinCreateScreen(),
+                    PinCreateScreen.routeName: (context) => PinCreateScreen(),
 
                   },
                 );

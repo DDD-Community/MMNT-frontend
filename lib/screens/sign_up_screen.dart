@@ -8,6 +8,7 @@ import '../models/error_model.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
+  static const routeName = '/sign-up-screen';
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();

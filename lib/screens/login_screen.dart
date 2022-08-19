@@ -5,6 +5,7 @@ import '../constants/style_constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
+  static const routeName = "/";
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();

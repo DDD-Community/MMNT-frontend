@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class PinCreateScreen extends StatelessWidget {
+  static const routeName = '/pin-create-screen';
   Widget _inform = Image.asset("assets/images/check_image.png");
   final ImagePicker _picker = ImagePicker();
   // double? lat_y;

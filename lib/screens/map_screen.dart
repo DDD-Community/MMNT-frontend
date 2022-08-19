@@ -34,6 +34,7 @@ import '../showstory/show_story_arguments.dart';
 import '../constants/token_temp_file.dart' as Token;
 
 class MapScreen extends StatefulWidget {
+  static const routeName = '/map-screen';
   @override
   _MapScreenState createState() => _MapScreenState();
 }
