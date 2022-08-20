@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../component/error_dialog.dart';
 import '../models/error_model.dart';
-import '../constants/token_temp_file.dart' as Token;
 import '../providers/app_provider.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -44,7 +43,10 @@ class _SignInScreenState extends State<SignInScreen> {
 
       if(response.data['isSuccess']) {
         // TODO shared preference로 토큰 관리
-        Token.jwt_token = response.data['result']['accessToken'];
+
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString('token', response.data['result']['accessToken']);
+
         Navigator.pushNamed(context, '/map-screen');
       }
     } on DioError catch (error) {

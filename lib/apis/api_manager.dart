@@ -7,18 +7,20 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 import '../component/error_dialog.dart';
 import '../models/error_model.dart';
 import 'mmnt_api_service.dart';
-import '../constants/token_temp_file.dart' as Token;
 
 class ApiManager {
   final MmntApiService _mmntApiService = MmntApiService();
 
   Future<dynamic> getPins(BuildContext context, String url, LatLng latlngPosition) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
 
       BaseOptions options = BaseOptions(
 
@@ -26,7 +28,7 @@ class ApiManager {
           receiveTimeout: 10000,
 
           // TODO 배포전 수정
-          headers: {'Authorization':'Bearer ${Token.jwt_token}',
+          headers: {'Authorization':'Bearer $token',
 
           // headers: {'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE0IiwiZW1haWwiOiJwcmFjb25maUBuYXZlci5jb20iLCJpYXQiOjE2NTk1MzI5OTEsImV4cCI6MTY2MDc0MjU5MX0.Rsvu5t9jh1XO5MzmQNVHI1e1TQdRV_UepCy8iHB791k',
 
@@ -61,6 +63,8 @@ class ApiManager {
 
   Future<dynamic> getPinDetail(BuildContext context, String url, LatLng latlngPosition) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
 
       BaseOptions options = BaseOptions(
 
@@ -68,10 +72,8 @@ class ApiManager {
           receiveTimeout: 10000,
 
           // TODO 배포전 수정
-          headers: {'Authorization':'Bearer ${Token.jwt_token}',
-
-            // headers: {'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE0IiwiZW1haWwiOiJwcmFjb25maUBuYXZlci5jb20iLCJpYXQiOjE2NTk1MzI5OTEsImV4cCI6MTY2MDc0MjU5MX0.Rsvu5t9jh1XO5MzmQNVHI1e1TQdRV_UepCy8iHB791k',
-
+          headers: {
+            'Authorization':'Bearer $token',
           }
       );
 
@@ -120,11 +122,14 @@ class ApiManager {
     // }
 
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
       BaseOptions options = BaseOptions(
 
           connectTimeout: 10000,
           receiveTimeout: 10000,
-          headers: {'Authorization':'Bearer ${Token.jwt_token}'}
+          headers: {'Authorization':'Bearer $token'}
       );
 
       Dio dio = Dio(options);

@@ -8,12 +8,12 @@ import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../constants/token_temp_file.dart' as Token;
 
 class CheckAll extends StatefulWidget {
   String _youtubeId;
@@ -64,8 +64,11 @@ class _CheckAll extends State<CheckAll> {
     return "Test_User";
   }
 
-  String _getCurrentUserToken() {
-    return Token.jwt_token;
+  Future<String> _getCurrentUserToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    return token;
   }
 
   void _submit() async {

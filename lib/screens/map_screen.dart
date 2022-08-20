@@ -16,6 +16,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart' as Lottie;
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -31,7 +32,6 @@ import '../providers/sliidng_panel_provider.dart';
 import '../providers/storylist_provider.dart';
 import '../showstory/show_story.dart';
 import '../showstory/show_story_arguments.dart';
-import '../constants/token_temp_file.dart' as Token;
 import '../userpage/user_page.dart';
 
 class MapScreen extends StatefulWidget {
@@ -119,12 +119,13 @@ class _MapScreenState extends State<MapScreen> {
   Future<List<Story>> _getMomentList(String currentPinIndex) async {
     // final token =
     //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE0IiwiZW1haWwiOiJwcmFjb25maUBuYXZlci5jb20iLCJpYXQiOjE2NjAxODAzMTIsImV4cCI6MTY2MTM4OTkxMn0.JFyfKkE7udj5IAAXttGOmRK-_bbRdY4vENypAsjZ1Qg";
-
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
     final url = Uri.parse(
         "https://dev.mmnt.link/moment/pin/$currentPinIndex?page=1&limit=4");
     final response = await http.get(url, headers: {
       "accept": "application/json; charset=utf-8",
-      "Authorization": "Bearer ${Token.jwt_token}",
+      "Authorization": "Bearer $token",
     });
 
     if (response.statusCode == 200) {
@@ -545,6 +546,7 @@ class _MapScreenState extends State<MapScreen> {
                                 width: 35.w,
                                 child: GestureDetector(
                                   onTap: () {
+                                    HapticFeedback.lightImpact();
                                     Navigator.pushNamed(context, UserPage.routeName);
                                   },
                                   child: CircleAvatar(

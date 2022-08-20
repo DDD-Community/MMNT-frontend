@@ -3,7 +3,7 @@ import 'package:dash_mement/userpage/user_history.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../constants/token_temp_file.dart' as Token;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MomentInfo extends StatelessWidget {
   static const double _padding = 20;
@@ -87,10 +87,10 @@ class MomentInfo extends StatelessWidget {
   }
 
   Future<String> _getCurrentUserToken() async {
-    Future.delayed(Duration(milliseconds: 100));
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
 
-    // return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NjA1MzczMjUsImV4cCI6MTY2MTc0NjkyNX0.Sh63lxc7Bu1dizWa36ZdgbCDnxxrXYZ-74SmfEI5Buo";
-    return Token.jwt_token;
+    return token;
   }
 
   Future<List<StorySub>> _getMoment() async {
