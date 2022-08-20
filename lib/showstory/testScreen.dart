@@ -13,8 +13,12 @@ class TestScreen extends StatelessWidget {
     if (storyList != null) {
       storyList.forEach((element) => storyListProvider.add(element));
       Navigator.pushNamed(context, ShowStory.routeName,
-          arguments:
-              ShowStoryArguments(storyList[0].link, 37.5135790, 127.104765));
+          arguments: ShowStoryArguments(
+              firstUrl: storyList[0].link,
+              lat_y: 37.5135790,
+              lng_x: 127.104765,
+              pin_idx: 17,
+              length: 2));
     } else {}
   }
 

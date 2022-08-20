@@ -32,6 +32,7 @@ import '../providers/storylist_provider.dart';
 import '../showstory/show_story.dart';
 import '../showstory/show_story_arguments.dart';
 import '../constants/token_temp_file.dart' as Token;
+import '../userpage/user_page.dart';
 
 class MapScreen extends StatefulWidget {
   static const routeName = '/map-screen';
@@ -101,17 +102,17 @@ class _MapScreenState extends State<MapScreen> {
     StoryListProvider storyListProvider = Provider.of<StoryListProvider>(context, listen: false);
     storyListProvider.clear();
     MapProvider mapProvider = Provider.of<MapProvider>(context, listen: false);
-    Provider.of<PushStoryProvider>(context, listen: false)
-        .setLatLng(double.parse(pinModel.latitude_y), double.parse(pinModel.longitude_x));
+    Provider.of<PushStoryProvider>(context, listen: false).setLatLng(double.parse(pinModel.latitude_y), double.parse(pinModel.longitude_x),);
 
     List<Story> storyList = await _getMomentList(pinModel.id);
     if (storyList != null) {
       storyList.forEach((element) => storyListProvider.add(element));
       Navigator.pushNamed(context, ShowStory.routeName,
           arguments: ShowStoryArguments(
-              storyList[0].link,
-              mapProvider.currentLatLng!.latitude,
-              mapProvider.currentLatLng!.longitude));
+            firstUrl: storyList[0].link,
+            lat_y: mapProvider.currentLatLng!.latitude,
+            lng_x: mapProvider.currentLatLng!.longitude,
+          ));
     } else {}
   }
 
@@ -154,15 +155,9 @@ class _MapScreenState extends State<MapScreen> {
 
       // 도로명 + 건물 번호
       return "${jsonDecode(response_main.body)["addressInfo"]['fullAddress']} ${jsonDecode(response_building.body)["addressInfo"]["buildingIndex"]}";
-
-    } catch(e) {
+    } catch (e) {
       return '해외';
-
-    } finally {
-
-    }
-
-
+    } finally {}
   }
 
   Future<void> _getUserLocation(BuildContext context) async {
@@ -258,11 +253,9 @@ class _MapScreenState extends State<MapScreen> {
           //   double.parse(element['pin_x']!),
           // )
         });
-        if(value.data['result'][1]['mainPin'].isNotEmpty) {
-
+        if (value.data['result'][1]['mainPin'].isNotEmpty) {
           MomentModel mainMoment = MomentModel.fromJson(value.data['result'][1]['mainPin']);
           Provider.of<MapProvider>(context, listen: false).updateMainMoment(mainMoment);
-
         }
       });
       _setMarkerUi(context, latlngPosition);
@@ -372,6 +365,7 @@ class _MapScreenState extends State<MapScreen> {
             // icon: markerbitmap,
             position: LatLng(double.parse(element.latitude_y), double.parse(element.longitude_x)),
             onTap: () {
+              HapticFeedback.lightImpact();
               _push(context, element);
               // _pc.open
             }),
@@ -549,10 +543,15 @@ class _MapScreenState extends State<MapScreen> {
                             child: SizedBox(
                                 height: 35.h,
                                 width: 35.w,
-                                child: CircleAvatar(
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: Colors.black,
-                                  child: Icon(Icons.person),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, UserPage.routeName);
+                                  },
+                                  child: CircleAvatar(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Colors.black,
+                                    child: Icon(Icons.person),
+                                  ),
                                 )),
                           )
                         ],
@@ -584,79 +583,92 @@ class _MapScreenState extends State<MapScreen> {
                   height: 42.h,
                 ),
                 Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    child: _showMarkers.isEmpty
-                        ? const NoPinMoment()
-                        : Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: _showMarkers.isEmpty
+                      ? const NoPinMoment()
+                      : Column(
                           children: [
-                            Text(
-                              mapProvider.mainMoment.title,
-                              style: kWhiteBold20,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  mapProvider.mainMoment.title,
+                                  style: kWhiteBold20,
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 16.h,
+                            ),
+                            Container(
+                              padding:
+                                  EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 16.h),
+                              height: 160.h,
+                              width: 335.w,
+                              color: Color(0xff1E1E21),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Text(
+                                            mapProvider.mainMoment.title,
+                                            style: kGrayBold18.copyWith(
+                                                color: Colors.white),
+                                          ),
+                                          Text(
+                                            mapProvider.mainMoment.artist,
+                                            style: kGray12,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: Lottie.Lottie.asset(
+                                              "assets/json/equalizer.json"))
+                                    ],
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      minimumSize: const Size.fromHeight(50),
+                                    ),
+                                    child: const Text(
+                                      '지금 이곳에 기록된 모먼트 보기',
+                                    ),
+                                    onPressed: () {
+                                      // Provider.of<StoryListProvider>(context, listen: false).getStoryList(context, state.mainMoment.pin_idx);
+                                      // Navigator.pushNamed(
+                                      //   context,
+                                      //   ShowStory.routeName,
+                                      //   arguments: ShowStoryArguments(
+                                      //       'https://youtu.be/oxs3K8SPXpI',
+                                      //       state.currentLatLng!.latitude,
+                                      //       state.currentLatLng!.longitude),
+                                      // );
+                                      _push(
+                                          context,
+                                          PinModel(
+                                              id: mapProvider
+                                                  .mainMoment.pin_idx,
+                                              latitude_y: mapProvider
+                                                  .mainMoment.latitude_y!,
+                                              longitude_x: mapProvider
+                                                  .mainMoment.longitude_x!));
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        SizedBox(
-                          height: 16.h,
-                        ),
-                        Container(
-                          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 16.h),
-                          height: 160.h,
-                          width: 335.w,
-                          color: Color(0xff1E1E21),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        mapProvider.mainMoment.title,
-                                        style: kGrayBold18.copyWith(color: Colors.white),
-                                      ),
-                                      Text(
-                                        mapProvider.mainMoment.artist,
-                                        style: kGray12,
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                      width: 40,
-                                      height: 40,
-                                      child: Lottie.Lottie.asset("assets/json/equalizer.json"))
-                                ],
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: const Size.fromHeight(50),
-                                ),
-                                child: const Text(
-                                  '지금 이곳에 기록된 모먼트 보기',
-                                ),
-                                onPressed: () {
-                                  // Provider.of<StoryListProvider>(context, listen: false).getStoryList(context, state.mainMoment.pin_idx);
-                                  // Navigator.pushNamed(
-                                  //   context,
-                                  //   ShowStory.routeName,
-                                  //   arguments: ShowStoryArguments(
-                                  //       'https://youtu.be/oxs3K8SPXpI',
-                                  //       state.currentLatLng!.latitude,
-                                  //       state.currentLatLng!.longitude),
-                                  // );
-                                  _push(context, PinModel(id: mapProvider.mainMoment.pin_idx, latitude_y: mapProvider.mainMoment.latitude_y!, longitude_x: mapProvider.mainMoment.longitude_x!));
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                )],
-
+                )
+              ],
             ),
           ),
           // the fab
