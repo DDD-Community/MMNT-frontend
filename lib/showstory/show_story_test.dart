@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/poststory/post_image.dart';
 import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
@@ -16,29 +17,36 @@ import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-/* 
-showStory는 유튜브 처음 링크 필요
-나머지 데이터는 provider로 생성
+/*
+필요한 초기값
+pinNumber: String도 괜찮고 
+length: 최대 길이 필요
+lat, lng: 위도 경도
 */
-class ShowStory extends StatefulWidget {
-  final ShowStoryArguments _args;
-  const ShowStory(this._args, {Key? key}) : super(key: key);
+
+/* 
+테스트 모먼트 6개
+*/
+class ShowStoryTest extends StatefulWidget {
+  const ShowStoryTest({Key? key}) : super(key: key);
   // late String _initialVideoLink;
 
-  static const routeName = "/show-story-screen";
+  static const routeName = "/show-story-test";
 
   @override
   State<StatefulWidget> createState() {
-    return _ShowStory();
+    return _ShowStoryTest();
   }
 }
 
-class _ShowStory extends State<ShowStory> {
-  late StoryListProvider _storyList;
+class _ShowStoryTest extends State<ShowStoryTest> {
   late PushStoryProvider _pushStory;
   List<ImageContainer> _storyWidgetList = [];
   late double _percent;
+  int _loadValue = 1;
   int _currentValue = 1;
+  int _maxIndex = 2;
+  String _pinNum = "17"; //test for
 
   //youtube
   List<String> _urlList = [];
@@ -82,16 +90,70 @@ class _ShowStory extends State<ShowStory> {
   }
 
   String _getUserToken() {
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NTk2MjYwMzksImV4cCI6MTY2MDgzNTYzOX0.j3cNmfXexSL9sVynKmdBlA-NKtn4xYX4X7NHG5J1P_w";
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NjAwNTI2MDcsImV4cCI6MTY2MTI2MjIwN30.LFhbrNDnveuI-TSnOTSVyqBcJQTd60Z0o6iFhd7np64";
   }
 
-  void _getMoment(int index) {}
+  void _addMoment(String pinNum, int index) async {
+    final url = Uri.parse(
+        'https://dev.mmnt.link/moment/pin/${pinNum}?page=$index&limit=1');
+    final token = _getUserToken();
+    final response = await http.get(url, headers: {
+      "accept": 'aplication/json; charset=utf-8',
+      "Authorization": "Bearer $token"
+    });
+    if (response.statusCode == 200) {
+      List<dynamic> json = jsonDecode(response.body)["result"];
+
+      final List<Story> list =
+          json.map<Story>((js) => Story.fromJson(js)).toList();
+
+      list.forEach((element) {
+        setState(() {
+          _storyWidgetList
+              .add(ImageContainer.story(MediaQuery.of(context).size, element));
+        });
+      });
+    } else {
+      print(response.statusCode.toString());
+      throw Exception;
+    }
+  }
+
+  void _initItem() async {
+    final url =
+        Uri.parse('https://dev.mmnt.link/moment/pin/${_pinNum}?page=1&limit=3');
+    final token = _getUserToken();
+    final response = await http.get(url, headers: {
+      "accept": 'aplication/json; charset=utf-8',
+      "Authorization": "Bearer $token"
+    });
+    if (response.statusCode == 200) {
+      List<dynamic> json = jsonDecode(response.body)["result"];
+
+      final List<Story> list =
+          json.map<Story>((js) => Story.fromJson(js)).toList();
+
+      list.forEach((element) {
+        setState(() {
+          _storyWidgetList
+              .add(ImageContainer.story(MediaQuery.of(context).size, element));
+
+          _urlList.add(YoutubePlayer.convertUrlToId(element.link) ?? "error");
+        });
+      });
+    } else {
+      print(response.statusCode.toString());
+      throw Exception;
+    }
+  }
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initItem());
     _youtubePlayerController = YoutubePlayerController(
-        initialVideoId:
-            YoutubePlayer.convertUrlToId(this.widget._args.firstUrl) ?? "error",
+        initialVideoId: YoutubePlayer.convertUrlToId(
+                "https://www.youtube.com/watch?v=rlNEaqtRaXI") ??
+            "error",
         flags: YoutubePlayerFlags(
           autoPlay: true,
           mute: false,
@@ -114,19 +176,8 @@ class _ShowStory extends State<ShowStory> {
 
   @override
   Widget build(BuildContext context) {
-    _storyList = Provider.of<StoryListProvider>(context);
     _pushStory = Provider.of<PushStoryProvider>(context);
-    //storywidget 생성 / urlList 생성
-    _storyWidgetList = [];
-    for (int i = 0; i < _storyList.getLength(); i++) {
-      _storyWidgetList.add(ImageContainer.story(
-          MediaQuery.of(context).size, _storyList.getStoryAt(i)));
-      _urlList.add(
-          YoutubePlayer.convertUrlToId(_storyList.getStoryAt(i).link) ?? "");
-    }
-
-    _percent = _currentValue / _storyList.getLength();
-
+    _percent = _currentValue / _maxIndex;
     return Scaffold(
       backgroundColor: MmntStyle().mainBlack,
       appBar: AppBar(
@@ -138,8 +189,7 @@ class _ShowStory extends State<ShowStory> {
           backgroundColor: MmntStyle().mainBlack,
           shadowColor: Colors.transparent,
           title: FutureBuilder(
-              future:
-                  _getAddress(this.widget._args.lat_y, this.widget._args.lng_x),
+              future: _getAddress(37.6108952, 126.997679), //test for
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Text(
@@ -155,22 +205,28 @@ class _ShowStory extends State<ShowStory> {
               })),
       body: YoutubePlayerBuilder(
         player: YoutubePlayer(
-          controller: _youtubePlayerController,
-          width: MediaQuery.of(context).size.width * 0.4,
-        ),
+            controller: _youtubePlayerController,
+            width: 300 //MediaQuery.of(context).size.width * 0.4,
+            ),
         builder: (context, player) => SafeArea(
             child: Stack(alignment: Alignment.center, children: [
           Positioned(child: player),
           Positioned(
               child: Container(
-            width: MediaQuery.of(context).size.width * 0.4,
-            height: MediaQuery.of(context).size.width * 0.4,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
             color: MmntStyle().mainBlack,
           )),
           CarouselSlider(
             items: _storyWidgetList,
             options: CarouselOptions(
                 onPageChanged: (index, reason) {
+                  if (index >= 1 && _loadValue < index + 3) {
+                    int loadindex = 3 + index;
+                    _loadValue = loadindex;
+                    _addMoment(_pinNum, loadindex);
+                  }
+
                   _youtubePlayerController.load(_urlList[index]);
                   setState(() {
                     _currentValue = index + 1;
@@ -192,12 +248,12 @@ class _ShowStory extends State<ShowStory> {
                     value: _percent,
                     backgroundColor: MmntStyle().secondBlack,
                     valueColor: new AlwaysStoppedAnimation(MmntStyle().second),
-                  )))
+                  ))),
         ])),
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () => _postStory(
-              this.widget._args.lat_y, this.widget._args.lng_x, _pushStory),
+          onPressed: () =>
+              _postStory(37.6084443, 127.008789, _pushStory), //test for
           backgroundColor: MmntStyle().primary,
           child: Icon(
             Icons.add,
