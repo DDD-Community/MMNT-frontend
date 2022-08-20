@@ -4,6 +4,7 @@ import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/component/toast/mmnterror_toast.dart';
 import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
+import 'package:dash_mement/screens/map_screen.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import '../showstory/show_story.dart';
 
 class CheckAll extends StatefulWidget {
   String _youtubeId;
@@ -77,7 +80,7 @@ class _CheckAll extends State<CheckAll> {
       _showToast("사진 업로드 실패!", 200); // 에러 처리 해줘야함
     } else {
       final postUrl = Uri.parse("https://dev.mmnt.link/moment");
-      final token = _getCurrentUserToken();
+      final token = await _getCurrentUserToken();
       try {
         var data = <String, dynamic>{
           "pinX": _pushStoryProvider.longitude_x,
@@ -100,9 +103,9 @@ class _CheckAll extends State<CheckAll> {
         print("flutter post test: ${response.body}");
         // _pushStoryProvider.clear();
         if(_pushStoryProvider.postMode == PostMode.moment) {
-          Navigator.popUntil(context, ModalRoute.withName("/show-story-screen"));
+          Navigator.popUntil(context, ModalRoute.withName(ShowStory.routeName));
         } else {
-          Navigator.popUntil(context, ModalRoute.withName("/map-screen"));
+          Navigator.popUntil(context, ModalRoute.withName(MapScreen.routeName));
         }
       } catch (e) {
         print("flutter_error: ${e.toString()}");
