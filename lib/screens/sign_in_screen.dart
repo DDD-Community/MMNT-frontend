@@ -42,7 +42,6 @@ class _SignInScreenState extends State<SignInScreen> {
       var response = await Dio().post('https://dev.mmnt.link/user/sign-in', data: map);
 
       if(response.data['isSuccess']) {
-        // TODO shared preference로 토큰 관리
 
         final prefs = await SharedPreferences.getInstance();
         prefs.setString('token', response.data['result']['accessToken']);
