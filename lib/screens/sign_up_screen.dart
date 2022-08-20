@@ -1,10 +1,13 @@
 import 'package:dash_mement/component/error_dialog.dart';
+import 'package:dash_mement/screens/sign_in_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import '../constants/style_constants.dart';
 import '../models/error_model.dart';
+import '../providers/app_provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -72,20 +75,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void postSignup() async {
+    Provider.of<AppProvider>(context, listen: false).updateAppState(AppStatus.loading);
+    Map<String, dynamic> map = {
+      'email': emailController.text,
+      'password': passwordController.text
+    };
     try {
-      var response = await Dio().post('https://dev.mmnt.link/user/sign-up',
-          data: {
-            'email': emailController.text,
-            'value': passwordController.text
-          });
+      var response = await Dio().post('https://dev.mmnt.link/user/sign-up',data: map);
 
-      print(response);
       if (response.data['isSuccess']) {
-        // 회원가입 완료, 로그인 페이지로 이동
+        Navigator.pushReplacementNamed(context, SignInScreen.routeName);
       }
     } on DioError catch (error) {
       var errorMsg = ErrorModel.fromJson(error.response?.data);
       errorDialog(context, errorMsg.message.toString());
+    } finally {
+      Provider.of<AppProvider>(context, listen: false).updateAppState(AppStatus.loaded);
     }
   }
 

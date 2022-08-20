@@ -1,6 +1,7 @@
 import 'package:dash_mement/constants/style_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -31,8 +32,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
 
   void postSignin() async {
-    Provider.of<AppProvider>(context, listen: false)
-        .updateAppState(AppStatus.loading);
+    Provider.of<AppProvider>(context, listen: false).updateAppState(AppStatus.loading);
     try {
       Map<String, dynamic> map = {
         "email": emailController.text,
@@ -52,8 +52,7 @@ class _SignInScreenState extends State<SignInScreen> {
       var errorMsg = ErrorModel.fromJson(error.response?.data);
       errorDialog(context, errorMsg.message.toString());
     } finally {
-      Provider.of<AppProvider>(context, listen: false)
-          .updateAppState(AppStatus.loaded);
+      Provider.of<AppProvider>(context, listen: false).updateAppState(AppStatus.loaded);
     }
   }
 
@@ -130,7 +129,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size.fromHeight(50),
                           ),
-                          child: appProvider.appStatus == AppStatus.loading ? const CircularProgressIndicator() : const Text('로그인'),
+                          child: appProvider.appStatus == AppStatus.loading ? const CupertinoActivityIndicator() : const Text('로그인'),
                           onPressed: () {
                             postSignin();
                           },
