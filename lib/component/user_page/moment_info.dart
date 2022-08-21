@@ -1,4 +1,5 @@
 import 'package:dash_mement/domain/story.dart';
+import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/userpage/user_history.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -7,7 +8,7 @@ import 'package:http/http.dart' as http;
 class MomentInfo extends StatelessWidget {
   static const double _padding = 20;
 
-  Widget _title(BuildContext context) {
+  Widget _title(BuildContext context, bool isEmpty) {
     return Padding(
         padding: EdgeInsets.fromLTRB(20, 14, 10, 20),
         child:
@@ -21,14 +22,16 @@ class MomentInfo extends StatelessWidget {
                 letterSpacing: -0.03,
                 fontWeight: FontWeight.w600),
           ),
-          IconButton(
-            icon: Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-            ),
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                context, UserHistory.routeName, (_) => false),
-          )
+          isEmpty
+              ? Container(width: 4, height: 4)
+              : IconButton(
+                  icon: Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                  ),
+                  onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                      context, UserHistory.routeName, (_) => false),
+                )
         ]));
   }
 
@@ -87,7 +90,8 @@ class MomentInfo extends StatelessWidget {
 
   Future<String> _getCurrentUserToken() async {
     Future.delayed(Duration(milliseconds: 100));
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NjA1MzczMjUsImV4cCI6MTY2MTc0NjkyNX0.Sh63lxc7Bu1dizWa36ZdgbCDnxxrXYZ-74SmfEI5Buo";
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMxIiwiZW1haWwiOiJkb25nd29uMDAwMTAzQGdtYWlsLmNvbSIsImlhdCI6MTY2MTA5NDI5MSwiZXhwIjoxNjYyMzAzODkxfQ.UdoMioa1Sh5pRB-5WPzclnwsXpP4KkhjkS37BnDGDoc";
+    //return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NjA1MzczMjUsImV4cCI6MTY2MTc0NjkyNX0.Sh63lxc7Bu1dizWa36ZdgbCDnxxrXYZ-74SmfEI5Buo";
   }
 
   Future<List<StorySub>> _getMoment() async {
@@ -112,30 +116,55 @@ class MomentInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      _title(context),
-      Container(
-          height: MediaQuery.of(context).size.height * 0.4,
-          child: FutureBuilder<List<StorySub>>(
-              future: _getMoment(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(child: Text("${snapshot.error}"));
-                } else if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                } else {
-                  return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (BuildContext context, int index) => _moment(
-                          MediaQuery.of(context).size,
-                          index,
-                          snapshot.data!.length,
-                          snapshot.data![index]));
+    return // Column(children: [
+
+        FutureBuilder<List<StorySub>>(
+            future: _getMoment(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text("${snapshot.error}"));
+              } else if (!snapshot.hasData) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                if (snapshot.data!.length == 0) {
+                  return Column(children: [
+                    _title(context, true),
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                              padding: EdgeInsets.fromLTRB(0, 60, 0, 10),
+                              child: Image.asset("assets/images/bookmark.png")),
+                          Text("최근 모먼트 없음",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 18)),
+                          Text("핀을 생성하고 모먼트를 추가해보세요",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 15,
+                                  color: MmntStyle().primaryDisable)),
+                          //Container(height: 150)
+                        ])
+                  ]);
                 }
-              }))
-    ]);
+                return Column(children: [
+                  _title(context, false),
+                  Container(
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (BuildContext context, int index) =>
+                              _moment(
+                                  MediaQuery.of(context).size,
+                                  index,
+                                  snapshot.data!.length,
+                                  snapshot.data![index])))
+                ]);
+              }
+            });
+    // ]);
   }
 }
 
