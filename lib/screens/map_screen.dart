@@ -162,6 +162,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _getUserLocation(BuildContext context) async {
+    context.read<AppProvider>().updateAppState(AppStatus.loading);
     LocationPermission permission = await Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -691,6 +692,9 @@ class _MapScreenState extends State<MapScreen> {
                       color: Colors.black,
                     ),
                     onPressed: () {
+                      if(state.appStatus == AppStatus.loading) {
+                        return;
+                      }
                       HapticFeedback.mediumImpact();
                       _pc.close();
                       _getUserLocation(context);
