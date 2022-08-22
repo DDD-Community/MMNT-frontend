@@ -23,30 +23,26 @@ import 'showstory/show_story.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
-  await dotenv.load(fileName: "assets/config/.env");
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+  await dotenv.load(fileName: "assets/config/.env");
   runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+
+  @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AppProvider()),
-        ChangeNotifierProvider(create: (_) => MapProvider()),
-        ChangeNotifierProvider(create: (_) => SlidingPanelProvider()),
-        ChangeNotifierProvider(create: (_) => StoryListProvider()),
-        ChangeNotifierProvider(create: (_) => PushStoryProvider())
-      ],
-      child: FutureBuilder(
+    return FutureBuilder(
         future: Init.instance.initialize(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -58,64 +54,73 @@ class _MyAppState extends State<MyApp> {
             return ScreenUtilInit(
               designSize: const Size(375, 812),
               builder: (BuildContext context, Widget? child) {
-                return MaterialApp(
-                  title: 'dash_moment',
-                  debugShowCheckedModeBanner: false,
+                return
+                  MultiProvider(
+                    providers: [
+                      ChangeNotifierProvider(create: (_) => AppProvider()),
+                      ChangeNotifierProvider(create: (_) => MapProvider()),
+                      ChangeNotifierProvider(create: (_) => SlidingPanelProvider()),
+                      ChangeNotifierProvider(create: (_) => StoryListProvider()),
+                      ChangeNotifierProvider(create: (_) => PushStoryProvider())
+                    ],
+                    child: MaterialApp(
+                    title: 'dash_moment',
+                    debugShowCheckedModeBanner: false,
 
-                  // Dark theme 기반
-                  theme: ThemeData(
-                      fontFamily: 'Pretendard',
-                      brightness: Brightness.dark,
-                      highlightColor: Colors.yellow,
-                      scaffoldBackgroundColor: Colors.black,
-                      appBarTheme: AppBarTheme(
-                          centerTitle: true,
-                          titleTextStyle: kGrayBold18,
-                          color: Colors.black,
-                          iconTheme: IconThemeData(
-                            color: kAppbarIconColor,
-                          )),
-                      floatingActionButtonTheme:
-                          const FloatingActionButtonThemeData(
-                        backgroundColor: Color(0xFF1E5EFF),
-                      ),
-                      textTheme: TextTheme(
-                        // bodyText2가 기본 텍스트 스타일
-                        bodyText2: TextStyle(
-                            fontSize: 16.sp, fontWeight: FontWeight.w700),
-                      ),
-                      elevatedButtonTheme: ElevatedButtonThemeData(
-                          style: ElevatedButton.styleFrom(
-                              primary: kElevatedButtonColor)),
-                      textButtonTheme: TextButtonThemeData(
-                          style: TextButton.styleFrom(
-                              primary: const Color(0xFF707077),
-                              textStyle: TextStyle(fontSize: 15.sp))),
-                      inputDecorationTheme: InputDecorationTheme(
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: kTextFormFieldUnderlineColor,
-                                  width: 1.5)))),
-                  initialRoute: LoginScreen.routeName,
-                  routes: {
-                    LoginScreen.routeName: (context) => const LoginScreen(),
-                    SignUpScreen.routeName: (context) => const SignUpScreen(),
-                    SignInScreen.routeName: (context) => const SignInScreen(),
-                    MapScreen.routeName: (context) => MapScreen(),
-                    ShowStory.routeName: (context) => ShowStory(
-                        ModalRoute.of(context)!.settings.arguments
-                            as ShowStoryArguments),
-                    UserPage.routeName: (context) => UserPage(),
-                    ShowStoryTest.routeName: (context) => ShowStoryTest(),
-                    UserHistory.routeName: (context) => UserHistory(),
-                    PinCreateScreen.routeName: (context) => PinCreateScreen(),
-                  },
-                );
+                    // Dark theme 기반
+                    theme: ThemeData(
+                        fontFamily: 'Pretendard',
+                        brightness: Brightness.dark,
+                        highlightColor: Colors.yellow,
+                        scaffoldBackgroundColor: Colors.black,
+                        appBarTheme: AppBarTheme(
+                            centerTitle: true,
+                            titleTextStyle: kGrayBold18,
+                            color: Colors.black,
+                            iconTheme: IconThemeData(
+                              color: kAppbarIconColor,
+                            )),
+                        floatingActionButtonTheme:
+                            const FloatingActionButtonThemeData(
+                          backgroundColor: Color(0xFF1E5EFF),
+                        ),
+                        textTheme: TextTheme(
+                          // bodyText2가 기본 텍스트 스타일
+                          bodyText2: TextStyle(
+                              fontSize: 16.sp, fontWeight: FontWeight.w700),
+                        ),
+                        elevatedButtonTheme: ElevatedButtonThemeData(
+                            style: ElevatedButton.styleFrom(
+                                primary: kElevatedButtonColor)),
+                        textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                                primary: const Color(0xFF707077),
+                                textStyle: TextStyle(fontSize: 15.sp))),
+                        inputDecorationTheme: InputDecorationTheme(
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: kTextFormFieldUnderlineColor,
+                                    width: 1.5)))),
+                    initialRoute: MapScreen.routeName,
+                    routes: {
+                      LoginScreen.routeName: (context) => const LoginScreen(),
+                      SignUpScreen.routeName: (context) => const SignUpScreen(),
+                      SignInScreen.routeName: (context) => const SignInScreen(),
+                      MapScreen.routeName: (context) => MapScreen(),
+                      ShowStory.routeName: (context) => ShowStory(
+                          ModalRoute.of(context)!.settings.arguments
+                              as ShowStoryArguments),
+                      UserPage.routeName: (context) => UserPage(),
+                      ShowStoryTest.routeName: (context) => ShowStoryTest(),
+                      UserHistory.routeName: (context) => UserHistory(),
+                      PinCreateScreen.routeName: (context) => PinCreateScreen(),
+                    },
+                ),
+                  );
               },
             );
           }
         },
-      ),
     );
   }
 }
