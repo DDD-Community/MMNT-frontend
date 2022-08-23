@@ -46,6 +46,7 @@ app.*.map.json
 /android/app/release
 
 /ios/Flutter/Debug.xcconfig
+/ios/Runner/Storage.swift
 /android/key.properties
 /android/local.properties
 .env

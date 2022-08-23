@@ -19,6 +19,6 @@ path: /android/local.properties
 key: googleMapsApiKey=API-KEY
 
 [IOS]
-path: /ios/Flutter/Debug.xcconfig
-key: GOOGLE_MAPS_API_KEY=API-KEY
+path: /ios/Runner/Storage.swift
+let googleMapApiKey = "API-KEY"
 ```
