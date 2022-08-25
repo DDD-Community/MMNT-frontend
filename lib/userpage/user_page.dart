@@ -2,6 +2,7 @@ import 'package:dash_mement/component/user_page/moment_info.dart';
 import 'package:dash_mement/component/user_page/user_info.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
+import 'package:dash_mement/userpage/option_menu.dart';
 import 'package:flutter/material.dart';
 
 class UserPage extends StatelessWidget {
@@ -26,7 +27,9 @@ class UserPage extends StatelessWidget {
           ),
           actions: [
             IconButton(
-                onPressed: () => print("option"), icon: Icon(Icons.settings))
+                onPressed: () =>
+                    Navigator.pushNamed(context, OptionMenu.routeName),
+                icon: Icon(Icons.settings))
           ],
         ),
         body: Column(

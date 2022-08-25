@@ -9,8 +9,10 @@ import 'package:dash_mement/screens/sign_up_screen.dart';
 import 'package:dash_mement/showstory/show_story_arguments.dart';
 import 'package:dash_mement/showstory/show_story_test.dart';
 import 'package:dash_mement/showstory/testScreen.dart';
+import 'package:dash_mement/userpage/change_password.dart';
 import 'package:dash_mement/userpage/user_history.dart';
 import 'package:dash_mement/userpage/user_page.dart';
+import 'package:dash_mement/userpage/user_setting.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -25,6 +27,8 @@ import 'screens/splash.dart';
 import 'showstory/show_story.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dash_mement/userpage/option_menu.dart';
+import 'package:dash_mement/userpage/userinfo_arguments.dart';
 
 void main() async {
   await dotenv.load(fileName: "assets/config/.env");
@@ -114,7 +118,12 @@ class _MyAppState extends State<MyApp> {
                     '/test-screen': (context) => TestScreen(),
                     UserPage.routeName: (context) => UserPage(),
                     ShowStoryTest.routeName: (context) => ShowStoryTest(),
-                    UserHistory.routeName: ((context) => UserHistory())
+                    UserHistory.routeName: (context) => UserHistory(),
+                    OptionMenu.routeName: (context) => OptionMenu(),
+                    UserSetting.routeName: (context) => UserSetting(),
+                    ChangePassword.routeName: (context) => ChangePassword(
+                        ModalRoute.of(context)!.settings.arguments
+                            as UserInfoArguments)
                   },
                 );
               },
