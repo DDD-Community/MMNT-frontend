@@ -89,8 +89,7 @@ class _UserHistory extends State<UserHistory> {
   }
 
   void _backButton() {
-    Navigator.pushNamedAndRemoveUntil(
-        context, UserPage.routeName, (_) => false);
+    Navigator.pushReplacementNamed(context, UserPage.routeName);
   }
 
   void _acceptButton() async {

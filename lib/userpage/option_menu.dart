@@ -48,10 +48,6 @@ class OptionMenu extends StatelessWidget {
     Navigator.pushNamed(context, UserSetting.routeName);
   }
 
-  void _logout() {
-    print("logout test");
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +75,7 @@ class OptionMenu extends StatelessWidget {
                 onTap: () => Navigator.of(context).push(PageRouteBuilder(
                     opaque: false,
                     pageBuilder: (BuildContext context, _, __) {
-                      return LogoutAlert(acceptButton: _logout);
+                      return LogoutAlert();
                     })),
                 child: Padding(
                     padding: EdgeInsets.all(20),
@@ -95,11 +91,9 @@ class OptionMenu extends StatelessWidget {
 }
 
 class LogoutAlert extends StatelessWidget {
-  Function acceptButton;
-  LogoutAlert({required this.acceptButton}) {}
+  LogoutAlert() {}
   void _acceptButtonClick(BuildContext context) {
-    acceptButton();
-    Navigator.of(context).pop();
+    Navigator.pushNamedAndRemoveUntil(context, '/sign-in-screen', (_) => false);
   }
 
   @override

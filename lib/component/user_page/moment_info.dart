@@ -29,8 +29,8 @@ class MomentInfo extends StatelessWidget {
                     Icons.arrow_forward_ios,
                     size: 14,
                   ),
-                  onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                      context, UserHistory.routeName, (_) => false),
+                  onPressed: () => Navigator.pushReplacementNamed(
+                      context, UserHistory.routeName),
                 )
         ]));
   }
