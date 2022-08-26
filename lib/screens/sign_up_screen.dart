@@ -5,6 +5,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import '../apis/api_manager.dart';
 import '../constants/style_constants.dart';
 import '../models/error_model.dart';
 import '../providers/app_provider.dart';
@@ -84,6 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       var response = await Dio().post('https://dev.mmnt.link/user/sign-up',data: map);
 
       if (response.data['isSuccess']) {
+        ApiManager().postUser(emailController.text, passwordController.text);
         Navigator.pushReplacementNamed(context, SignInScreen.routeName);
       }
     } on DioError catch (error) {
@@ -103,7 +105,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: Scaffold(
           appBar: AppBar(
             title: const Text('회원가입'),
-            leading: GestureDetector(
+            leading:  GestureDetector(
               child: const Icon(
                 Icons.arrow_back_ios,
               ),
