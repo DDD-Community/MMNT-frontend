@@ -107,8 +107,10 @@ class _CheckAll extends State<CheckAll> {
         // _pushStoryProvider.clear();
         if(_pushStoryProvider.postMode == PostMode.moment) {
           // TODO 모먼트 추가후 추가된것 바로 확인할 수 있게 수정
-          Navigator.popUntil(context, ModalRoute.withName(ShowStory.routeName));
+          // Navigator.popUntil(context, ModalRoute.withName(ShowStory.routeName));
           // Navigator.pushNamedAndRemoveUntil(context, ShowStory.routeName, (route) => false);
+
+          Navigator.pushNamedAndRemoveUntil(context, MapScreen.routeName, (route) => false);
         } else {
           // Navigator.popUntil(context, ModalRoute.withName(MapScreen.routeName));
           Navigator.pushNamedAndRemoveUntil(context, MapScreen.routeName, (route) => false);
