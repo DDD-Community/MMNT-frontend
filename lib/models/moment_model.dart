@@ -28,7 +28,7 @@ class MomentModel {
     youtube_url = json['youtube_url'],
     music = json['music'],
     artist = json['artist'],
-    distance = json['distance'],
+    distance = json['distance'] == 0 ? 0 : json['distance'].toDouble(),
     latitude_y = json['pin_y'],
     longitude_x = json['pin_x'];
 }
