@@ -1,13 +1,17 @@
+import 'dart:convert';
+import 'package:dash_mement/providers/app_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../component/error_dialog.dart';
 import '../models/error_model.dart';
 import '../screens/login_screen.dart';
 import 'mmnt_api_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiManager {
   final MmntApiService _mmntApiService = MmntApiService();
@@ -42,6 +46,200 @@ class ApiManager {
       var errorMsg = ErrorModel.fromJson(error.response?.data);
       errorDialog(context, errorMsg.message.toString());
     }
+  }
+
+  void postUser(String email, String password) async {
+    try {
+      BaseOptions options = BaseOptions(
+
+          connectTimeout: 10000,
+          receiveTimeout: 10000,
+
+          headers: {
+            'Authorization':'Bearer ${dotenv.env['NOTION_API_KEY']}',
+            'Notion-Version': '2022-06-28',
+          }
+      );
+      const url = 'https://api.notion.com/v1/pages';
+
+      Dio dio = Dio(options);
+      // TODO: PATCH 테스트
+      Response response = await dio.post(url, data: {
+        "parent": {
+          "database_id": dotenv.env['NOTION_USER_DATABASE_ID'] ?? ""
+        },
+        "properties": {
+          "email": {
+            "title": [
+              {
+                "text": {
+                  "content": email
+                }
+              }
+            ]
+          },
+          "password": {
+            "rich_text": [
+              {
+                "text": {
+                  "content": password
+                }
+              }
+            ]
+          }
+        }
+      });
+      debugPrint(response.data);
+      if(response.statusCode == 200) {
+        final data = jsonDecode(response.data) as Map<String, dynamic>;
+      }
+
+
+
+
+    } catch(e) {
+      debugPrint(e.toString());
+
+    }
+
+  }
+
+  Future<void> postPin(String email, Map<String, dynamic> params) async {
+    try {
+      var data = <String, dynamic>{
+        "title": params["title"],
+        "description": params["description"],
+        "imageUrl": params["imageUrl"],
+        "youtubeUrl": params["youtubeUrl"],
+        "music": params["music"],
+        "artist": params["artist"],
+        "pinX": params["pinX"],
+        "pinY": params["pinY"],
+      };
+
+      BaseOptions options = BaseOptions(
+
+          connectTimeout: 10000,
+          receiveTimeout: 10000,
+
+          headers: {
+            'Authorization':'Bearer ${dotenv.env['NOTION_API_KEY']}',
+            'Notion-Version': '2022-06-28',
+          }
+      );
+      const url = 'https://api.notion.com/v1/pages';
+
+      Dio dio = Dio(options);
+      // TODO: PATCH 테스트
+      Response response = await dio.post(url, data: {
+
+
+        "parent": {
+          "database_id": dotenv.env['NOTION_PIN_DATABASE_ID'] ?? ""
+        },
+
+
+
+
+        "properties": {
+          "title": {
+            "title": [
+              {
+                "text": {
+                  "content": params["title"]
+                }
+              }
+            ]
+          },
+          "description": {
+            "rich_text": [
+              {
+                "text": {
+                  "content": params["description"]
+                }
+              }
+            ]
+          },
+          "imageUrl": {
+            "rich_text": [
+              {
+                "text": {
+                  "content": params["imageUrl"]
+                }
+              }
+            ]
+          },
+          "youtubeUrl": {
+            "rich_text": [
+              {
+                "text": {
+                  "content": params["youtubeUrl"]
+                }
+              }
+            ]
+          },
+          "music": {
+            "rich_text": [
+              {
+                "text": {
+                  "content": params["music"]
+                }
+              }
+            ]
+          },
+          "artist": {
+            "rich_text": [
+              {
+                "text": {
+                  "content": params["artist"]
+                }
+              }
+            ]
+          },
+          "longitude_x": {
+            "rich_text": [
+              {
+                "text": {
+                  "content": params["pinX"].toString()
+                }
+              }
+            ]
+          },
+          "latitude_y": {
+            "rich_text": [
+              {
+                "text": {
+                  "content": params["pinY"].toString()
+                }
+              }
+            ]
+          },
+          "email": {
+            "rich_text": [
+              {
+                "text": {
+                  "content": email
+                }
+              }
+            ]
+          },
+
+
+        }
+      });
+      debugPrint(response.data);
+      if(response.statusCode == 200) {
+        final data = jsonDecode(response.data) as Map<String, dynamic>;
+      }
+
+
+
+
+    } catch(e) {
+      debugPrint(e.toString());
+
+    }
+
   }
 
   Future<dynamic> getPinDetail(BuildContext context, String url, LatLng latlngPosition) async {
