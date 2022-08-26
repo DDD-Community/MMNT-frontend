@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dash_mement/apis/api_manager.dart';
 import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/component/toast/mmnterror_toast.dart';
 import 'package:dash_mement/domain/story.dart';
+import 'package:dash_mement/providers/app_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/screens/map_screen.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
@@ -30,6 +32,7 @@ class CheckAll extends StatefulWidget {
 class _CheckAll extends State<CheckAll> {
   late PushStoryProvider _pushStoryProvider;
   late YoutubePlayerController _youtubePlayerController;
+  late AppProvider _appProvider = Provider.of<AppProvider>(context, listen: false);
   late FToast _ftoast;
 
   @override
@@ -93,7 +96,7 @@ class _CheckAll extends State<CheckAll> {
           "artist": _pushStoryProvider.artist
         };
         var body = json.encode(data);
-
+        await ApiManager().postPin(_appProvider.userEmail, data);
         http.Response response = await http.post(postUrl,
             headers: <String, String>{
               'Content-Type': 'application/json',
@@ -103,9 +106,12 @@ class _CheckAll extends State<CheckAll> {
         print("flutter post test: ${response.body}");
         // _pushStoryProvider.clear();
         if(_pushStoryProvider.postMode == PostMode.moment) {
+          // TODO 모먼트 추가후 추가된것 바로 확인할 수 있게 수정
           Navigator.popUntil(context, ModalRoute.withName(ShowStory.routeName));
+          // Navigator.pushNamedAndRemoveUntil(context, ShowStory.routeName, (route) => false);
         } else {
-          Navigator.popUntil(context, ModalRoute.withName(MapScreen.routeName));
+          // Navigator.popUntil(context, ModalRoute.withName(MapScreen.routeName));
+          Navigator.pushNamedAndRemoveUntil(context, MapScreen.routeName, (route) => false);
         }
       } catch (e) {
         print("flutter_error: ${e.toString()}");
