@@ -1,13 +1,18 @@
 import 'package:dash_mement/component/error_dialog.dart';
+import 'package:dash_mement/screens/sign_in_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import '../apis/api_manager.dart';
 import '../constants/style_constants.dart';
-import '../domain/error_model.dart';
+import '../models/error_model.dart';
+import '../providers/app_provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
+  static const routeName = '/sign-up-screen';
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -21,6 +26,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isVerificationMailSent = false;
   bool isVerificationMatch = false;
   final _formKey = GlobalKey<FormState>();
+  FocusNode _emailFocus = FocusNode();
+  FocusNode _passwordFocus = FocusNode();
 
   @override
   void dispose() {
@@ -49,13 +56,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void checkVerification() async {
     try {
-      var response =
-          await Dio().post('https://dev.mmnt.link/auth/verification', data: {
-        'email': emailController.text.trim(),
-        'value': verificationController.text.trim()
-      });
+      Map<String, dynamic> map = {
+        "email": emailController.text.trim(),
+        "value": verificationController.text.trim()
+      };
 
-      print(response);
+      var response =
+          await Dio().post('https://dev.mmnt.link/auth/verification', data: map);
+
       if (response.data['isSuccess']) {
         setState(() {
           isVerificationMatch = true;
@@ -68,20 +76,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void postSignup() async {
+    Provider.of<AppProvider>(context, listen: false).updateAppState(AppStatus.loading);
+    Map<String, dynamic> map = {
+      'email': emailController.text,
+      'password': passwordController.text
+    };
     try {
-      var response = await Dio().post('https://dev.mmnt.link/user/sign-up',
-          data: {
-            'email': emailController.text.trim(),
-            'value': passwordController.text.trim()
-          });
+      var response = await Dio().post('https://dev.mmnt.link/user/sign-up',data: map);
 
-      print(response);
       if (response.data['isSuccess']) {
-        // 회원가입 완료, 로그인 페이지로 이동
+        ApiManager().postUser(emailController.text, passwordController.text);
+        Navigator.pushReplacementNamed(context, SignInScreen.routeName);
       }
     } on DioError catch (error) {
       var errorMsg = ErrorModel.fromJson(error.response?.data);
       errorDialog(context, errorMsg.message.toString());
+    } finally {
+      Provider.of<AppProvider>(context, listen: false).updateAppState(AppStatus.loaded);
     }
   }
 
@@ -94,7 +105,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: Scaffold(
           appBar: AppBar(
             title: const Text('회원가입'),
-            leading: GestureDetector(
+            leading:  GestureDetector(
               child: const Icon(
                 Icons.arrow_back_ios,
               ),
@@ -117,6 +128,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   children: [
                     Expanded(
                       child: TextFormField(
+                        focusNode: _emailFocus,
+                        keyboardType: TextInputType.emailAddress,
                         validator: (value) => EmailValidator.validate(value!)
                             ? null
                             : "Please enter a valid email",
@@ -166,6 +179,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Column(
                     children: [
                       TextFormField(
+                        focusNode: _passwordFocus,
+                        obscureText: true,
+                        keyboardType: TextInputType.visiblePassword,
                         controller: passwordController,
                         decoration: InputDecoration(
                             hintText: '비밀번호 (영문+숫자+특수문자 10자 이상)', hintStyle: kGray14.copyWith(fontWeight: FontWeight.w500,),),
@@ -173,6 +189,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter some text';
                           }
+
+                          // RegExp regex = RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{10,}$');
+                          // if(!regex.hasMatch(value)){
+                          //   return '특수문자, 대소문자, 숫자 포함 10자 이상 입력하세요.';
+                          // }
+
+                          return null;
+
                           if (passwordController.text != passwordCheckController.text) {
                             return '비밀번호가 일치하지 않습니다';
                           }
@@ -181,6 +205,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                       ),
                       TextFormField(
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                         controller: passwordCheckController,
                         decoration: InputDecoration(hintText: '비밀번호 확인',
                             hintStyle: kGray14.copyWith(fontWeight: FontWeight.w500,)),
@@ -210,10 +237,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         '회원가입',
                       ),
                       onPressed: () {
-                        if (!isVerificationMatch) {
-                          errorDialog(context, '인증 후 회원가입 가능합니다');
-                          return;
-                        }
+                        // if (!isVerificationMatch) {
+                        //   errorDialog(context, '인증 후 회원가입 가능합니다');
+                        //   return;
+                        // }
 
                         if (_formKey.currentState!.validate()) {
                           postSignup();

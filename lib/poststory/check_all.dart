@@ -1,19 +1,24 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:dash_mement/apis/api_manager.dart';
 import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/component/toast/mmnterror_toast.dart';
 import 'package:dash_mement/domain/story.dart';
+import 'package:dash_mement/providers/app_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
+import 'package:dash_mement/screens/map_screen.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import '../showstory/show_story.dart';
 
 class CheckAll extends StatefulWidget {
   String _youtubeId;
@@ -27,6 +32,7 @@ class CheckAll extends StatefulWidget {
 class _CheckAll extends State<CheckAll> {
   late PushStoryProvider _pushStoryProvider;
   late YoutubePlayerController _youtubePlayerController;
+  late AppProvider _appProvider = Provider.of<AppProvider>(context, listen: false);
   late FToast _ftoast;
 
   @override
@@ -64,8 +70,11 @@ class _CheckAll extends State<CheckAll> {
     return "Test_User";
   }
 
-  String _getCurrentUserToken() {
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NTc5OTcwMzMsImV4cCI6MTY1ODAwMDYzM30.PyDhlaAViCxtDLWBscJMW8w4ylyjQZpXfVldRoSdbn4";
+  Future<String> _getCurrentUserToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    return token;
   }
 
   void _submit() async {
@@ -74,7 +83,7 @@ class _CheckAll extends State<CheckAll> {
       _showToast("사진 업로드 실패!", 200); // 에러 처리 해줘야함
     } else {
       final postUrl = Uri.parse("https://dev.mmnt.link/moment");
-      final token = _getCurrentUserToken();
+      final token = await _getCurrentUserToken();
       try {
         var data = <String, dynamic>{
           "pinX": _pushStoryProvider.longitude_x,
@@ -87,7 +96,7 @@ class _CheckAll extends State<CheckAll> {
           "artist": _pushStoryProvider.artist
         };
         var body = json.encode(data);
-
+        await ApiManager().postPin(_appProvider.userEmail, data);
         http.Response response = await http.post(postUrl,
             headers: <String, String>{
               'Content-Type': 'application/json',
@@ -95,8 +104,17 @@ class _CheckAll extends State<CheckAll> {
             },
             body: body);
         print("flutter post test: ${response.body}");
-        _pushStoryProvider.clear();
-        Navigator.popUntil(context, ModalRoute.withName("/show-story-screen"));
+        // _pushStoryProvider.clear();
+        if(_pushStoryProvider.postMode == PostMode.moment) {
+          // TODO 모먼트 추가후 추가된것 바로 확인할 수 있게 수정
+          // Navigator.popUntil(context, ModalRoute.withName(ShowStory.routeName));
+          // Navigator.pushNamedAndRemoveUntil(context, ShowStory.routeName, (route) => false);
+
+          Navigator.pushNamedAndRemoveUntil(context, MapScreen.routeName, (route) => false);
+        } else {
+          // Navigator.popUntil(context, ModalRoute.withName(MapScreen.routeName));
+          Navigator.pushNamedAndRemoveUntil(context, MapScreen.routeName, (route) => false);
+        }
       } catch (e) {
         print("flutter_error: ${e.toString()}");
         _showToast("업로드 실패", 180);
@@ -173,7 +191,7 @@ class _CheckAll extends State<CheckAll> {
                           "", // img
                           _pushStoryProvider.context,
                           _pushStoryProvider.track!,
-                          _pushStoryProvider.artist!))
+                          _pushStoryProvider.artist!,),)
                 ])));
   }
 }

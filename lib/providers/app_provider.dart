@@ -10,10 +10,16 @@ enum AppStatus {
 }
 
 class AppProvider with ChangeNotifier {
+  String userEmail = '';
   AppStatus appStatus = AppStatus.initial;
 
-  void updateAppState(AppStatus newappStatus) {
-    appStatus = newappStatus;
+  void updateAppState(AppStatus status) {
+    appStatus = status;
+    notifyListeners();
+  }
+
+  void updateUserEmail(String email) {
+    userEmail = email;
     notifyListeners();
   }
 }

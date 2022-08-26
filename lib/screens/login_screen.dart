@@ -1,3 +1,5 @@
+import 'package:dash_mement/screens/sign_in_screen.dart';
+import 'package:dash_mement/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,7 +7,7 @@ import '../constants/style_constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
-
+  static const routeName = "/";
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -16,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset : false,
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 50.w),
         child: Column(
@@ -48,11 +50,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 54.h,
                 width: 335.w,
                 child: ElevatedButton(
-                    child: const Text('이메일 주소로 로그인'),
-                    onPressed: () {
-                      HapticFeedback.mediumImpact();
-                      Navigator.pushNamed(context, '/sign-in-screen');
-                    }, )),
+                  child: Text(
+                    '이메일 주소로 로그인',
+                    style: kWhiteBold15,
+                  ),
+                  onPressed: () {
+                    HapticFeedback.mediumImpact();
+                    Navigator.pushNamed(context, SignInScreen.routeName);
+                  },
+                )),
             SizedBox(
               height: 10.h,
             ),
@@ -65,19 +71,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       TextButton(
-                        child: const Text('회원가입'),
+                        child: Text('회원가입', style: kGrayBold15),
                         onPressed: () {
                           HapticFeedback.mediumImpact();
-                          Navigator.pushNamed(context, '/sign-up-screen');
-                      }, ),
+                          Navigator.pushNamed(context, SignUpScreen.routeName);
+                        },
+                      ),
                       Container(
                         width: 2,
                         height: 15,
                         color: kTextButtonColor,
                       ),
-                      TextButton(onPressed: () {
-                        HapticFeedback.mediumImpact();
-                      }, child: const Text('로그인문의'))
+                      TextButton(
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                        },
+                        child: Text('로그인문의', style: kGrayBold15),
+                      ),
                     ],
                   ),
                 )),

@@ -52,7 +52,9 @@ class _ShowStory extends State<ShowStory> {
         context, MaterialPageRoute(builder: (_) => PostImage(_backFromChild)));
   }
 
-  void _backButton() {}
+  void _backButton() {
+    Navigator.of(context).pop();
+  }
 
   //youtube 재생 기능(차일드가 꺼지면...)
   void _backFromChild() {
@@ -80,12 +82,6 @@ class _ShowStory extends State<ShowStory> {
       throw Exception();
     }
   }
-
-  String _getUserToken() {
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NTk2MjYwMzksImV4cCI6MTY2MDgzNTYzOX0.j3cNmfXexSL9sVynKmdBlA-NKtn4xYX4X7NHG5J1P_w";
-  }
-
-  void _getMoment(int index) {}
 
   @override
   void initState() {

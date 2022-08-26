@@ -21,6 +21,7 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def googleMapsApiKey = localProperties.getProperty('googleMapsApiKey')
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -54,6 +55,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders["googleMapsApiKey"] = googleMapsApiKey
     }
 
     signingConfigs {

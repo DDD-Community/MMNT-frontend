@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class Splash extends StatelessWidget {
   static const id = '/splash';
@@ -6,8 +7,7 @@ class Splash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-        backgroundColor: const Color(0xff000000),
-        body: Center(child: Image.asset('assets/gif/MMNT_logo animation.gif')));
+      backgroundColor: const Color(0xFF1E5EFF),
+      body: Center(child: Image.asset('assets/gif/splash_logo.gif')));
   }
 }

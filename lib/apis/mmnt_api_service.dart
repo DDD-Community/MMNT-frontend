@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MmntApiService {
   Dio? _dio;
@@ -19,14 +20,23 @@ class MmntApiService {
     _dio = initApiServiceDio();
   }
 
+  Future<String> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    return token;
+  }
+
   Dio initApiServiceDio() {
+
     final baseOption = BaseOptions(
       connectTimeout: 45 * 1000,
       receiveTimeout: 45 * 1000,
       // baseUrl: 'https://maps.googleapis.com/maps/api/place/',
-      baseUrl: 'https://dev.mmnt.link/moment',
+      baseUrl: 'https://dev.mmnt.link',
       contentType: 'application/json',
+      headers: {'Authorization':'Bearer ${getToken()}'},
     );
+
     mDio.options = baseOption;
 
     final mInterceptorsWrapper =

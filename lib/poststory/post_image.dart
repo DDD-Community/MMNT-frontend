@@ -49,11 +49,13 @@ class PostImage extends StatelessWidget {
   Widget build(BuildContext context) {
     Size _buttonSize = Size(MediaQuery.of(context).size.width * 0.9,
         MediaQuery.of(context).size.height * 0.075);
-    if (lat_y != null && lng_x != null) {
+
       PushStoryProvider pushStory = Provider.of<PushStoryProvider>(context);
-      pushStory.latitude_y = lat_y!;
-      pushStory.longitude_x = lng_x!;
-    }
+      // pushStory.latitude_y = lat_y;
+      // pushStory.longitude_x = lng_x;
+      pushStory.postMode = PostMode.moment;
+
+
 
     return Scaffold(
         backgroundColor: MmntStyle().mainBlack,

@@ -45,10 +45,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-
-/android/app/src/main/AndroidManifest.xml
-/ios/Runner/AppDelegate.swift
-
-
+/ios/Flutter/Debug.xcconfig
+/ios/Runner/Storage.swift
 /android/key.properties
+/android/local.properties
 .env

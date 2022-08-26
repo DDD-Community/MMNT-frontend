@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:dash_mement/models/moment_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class InfoWindowProvider extends ChangeNotifier {
+class SlidingPanelProvider extends ChangeNotifier {
+
   bool showInfoWindow = false;
   bool _tempHidden = false;
   double? leftMargin;
@@ -70,7 +72,7 @@ class InfoWindowProvider extends ChangeNotifier {
 
   double? get topMarginData => topMargin;
 
-  void resetInfoWindowProvider() {
+  void resetSlidingPanelProvider() {
     showInfoWindow = false;
     _tempHidden = false;
     leftMargin = 0.0;

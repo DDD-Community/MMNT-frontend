@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dash_mement/component/story/image_container.dart';
 import 'package:dash_mement/component/story/story_column.dart';
 import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
@@ -8,6 +7,7 @@ import 'package:dash_mement/userpage/user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserHistory extends StatefulWidget {
   static const routeName = "user-history-page";
@@ -25,12 +25,14 @@ class _UserHistory extends State<UserHistory> {
   int _currentValue = 1;
   String _appBarText = "로딩중..";
 
-  String _getCurrentToken() {
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE1IiwiZW1haWwiOiJkb25nd29uMDEwM0BuYXZlci5jb20iLCJpYXQiOjE2NjA1MzczMjUsImV4cCI6MTY2MTc0NjkyNX0.Sh63lxc7Bu1dizWa36ZdgbCDnxxrXYZ-74SmfEI5Buo";
+  Future<String> _getCurrentToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    return token;
   }
 
   void _initItem() async {
-    final token = _getCurrentToken();
+    final token = await _getCurrentToken();
     final url = Uri.parse(
         'https://dev.mmnt.link/moment/my-history?page=1&limit=3&type=detail');
     final response = await http.get(url, headers: {
