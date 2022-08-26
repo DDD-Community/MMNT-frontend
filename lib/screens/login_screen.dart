@@ -1,3 +1,5 @@
+import 'package:dash_mement/screens/sign_in_screen.dart';
+import 'package:dash_mement/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -54,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   onPressed: () {
                     HapticFeedback.mediumImpact();
-                    Navigator.pushNamed(context, '/sign-in-screen');
+                    Navigator.pushNamed(context, SignInScreen.routeName);
                   },
                 )),
             SizedBox(
@@ -72,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text('회원가입', style: kGrayBold15),
                         onPressed: () {
                           HapticFeedback.mediumImpact();
-                          Navigator.pushNamed(context, '/sign-up-screen');
+                          Navigator.pushNamed(context, SignUpScreen.routeName);
                         },
                       ),
                       Container(

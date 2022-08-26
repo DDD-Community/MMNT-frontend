@@ -6,6 +6,7 @@ import 'package:dash_mement/constants/file_constants.dart';
 import 'package:dash_mement/models/moment_model.dart';
 import 'package:dash_mement/providers/app_provider.dart';
 import 'package:dash_mement/providers/map_provider.dart';
+import 'package:dash_mement/screens/pin_create_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -110,8 +111,8 @@ class _MapScreenState extends State<MapScreen> {
       Navigator.pushNamed(context, ShowStory.routeName,
           arguments: ShowStoryArguments(
             firstUrl: storyList[0].link,
-            lat_y: mapProvider.currentLatLng!.latitude,
-            lng_x: mapProvider.currentLatLng!.longitude,
+            lat_y: double.parse(pinModel.latitude_y),
+            lng_x: double.parse(pinModel.longitude_x),
           ));
     } else {}
   }
@@ -367,8 +368,11 @@ class _MapScreenState extends State<MapScreen> {
             // icon: markerbitmap,
             position: LatLng(double.parse(element.latitude_y), double.parse(element.longitude_x)),
             onTap: () {
+
               HapticFeedback.lightImpact();
               _push(context, element);
+              Provider.of<PushStoryProvider>(context, listen: false).latitude_y = double.parse(element.latitude_y);
+              Provider.of<PushStoryProvider>(context, listen: false).longitude_x = double.parse(element.longitude_x);
               // _pc.open
             }),
       );
@@ -698,6 +702,7 @@ class _MapScreenState extends State<MapScreen> {
                       HapticFeedback.mediumImpact();
                       _pc.close();
                       _getUserLocation(context);
+
                     },
                   ),
                 ),
@@ -727,7 +732,7 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                       onPressed: () {
                         HapticFeedback.mediumImpact();
-                        Navigator.pushNamed(context, '/pin-create-screen');
+                        Navigator.pushNamed(context, PinCreateScreen.routeName);
                       }),
                 ),
                 SizedBox(
