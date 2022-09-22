@@ -390,17 +390,13 @@ class _MapScreenState extends State<MapScreen> {
 
     if (_pins.isEmpty) {
       CameraPosition cameraPosition =
-          new CameraPosition(target: latlngPosition, zoom: 14);
+          CameraPosition(target: latlngPosition, zoom: 14);
       _mapController
           .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
     } else {
       _mapController.animateCamera(
           CameraUpdate.newLatLngBounds(_getBounds(_pinBound), 50));
     }
-
-    Future.delayed(const Duration(seconds: 3), _pc.open);
-    _mapController
-        .animateCamera(CameraUpdate.newLatLngBounds(_getBounds(_pinBound), 50));
 
     Future.delayed(const Duration(seconds: 2), _pc.open);
   }

@@ -10,7 +10,7 @@ class ErrorModel {
     status = json['status'];
     statusCode = json['statusCode'];
     response = json['response'];
-    message = json['message'];
+    message = json['message'].runtimeType == String ? [json['message']] : json['message'];
   }
 
   Map<String, dynamic> toJson() {

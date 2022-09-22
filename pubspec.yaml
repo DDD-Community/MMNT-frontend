@@ -40,6 +40,7 @@ dependencies:
   fluster: ^1.2.0
   shared_preferences: ^2.0.15
   equatable: ^2.0.3
+  flutter_inappwebview: ^5.4.3+7
 
 dev_dependencies:
   flutter_test:

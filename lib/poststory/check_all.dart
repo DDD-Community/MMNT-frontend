@@ -78,6 +78,11 @@ class _CheckAll extends State<CheckAll> {
   }
 
   void _submit() async {
+    final state = Provider.of<AppProvider>(context, listen: false);
+    if(state.appStatus == AppStatus.loading) {
+      return;
+    }
+    Provider.of<AppProvider>(context, listen: false).updateAppState(AppStatus.loading);
     String imageUrl = await _uploadUrl(_pushStoryProvider.path!);
     if (imageUrl == "ERROR") {
       _showToast("사진 업로드 실패!", 200); // 에러 처리 해줘야함
@@ -141,6 +146,7 @@ class _CheckAll extends State<CheckAll> {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<AppProvider>();
     _pushStoryProvider = Provider.of<PushStoryProvider>(context);
     return Scaffold(
         backgroundColor: MmntStyle().mainBlack,
@@ -168,12 +174,15 @@ class _CheckAll extends State<CheckAll> {
                 onTap: () => _submit())
           ],
         ),
-        body: YoutubePlayerBuilder(
-            player: YoutubePlayer(
-              controller: _youtubePlayerController,
-              width: 30,
-            ),
-            builder: (context, player) => Stack(children: [
+        body: Stack(
+
+          children: [
+            YoutubePlayerBuilder(
+                player: YoutubePlayer(
+                  controller: _youtubePlayerController,
+                  width: 30,
+                ),
+                builder: (context, player) => Stack(children: [
                   player,
                   Container(
                     width: 40,
@@ -181,17 +190,22 @@ class _CheckAll extends State<CheckAll> {
                     color: MmntStyle().mainBlack,
                   ),
                   ImageContainer.check(
-                      MediaQuery.of(context).size,
-                      _pushStoryProvider.path,
-                      Story(
-                          _pushStoryProvider.title!,
-                          _getCurrenttUser(), // user
-                          _pushStoryProvider.dateTime!,
-                          _pushStoryProvider.link!,
-                          "", // img
-                          _pushStoryProvider.context,
-                          _pushStoryProvider.track!,
-                          _pushStoryProvider.artist!,),)
-                ])));
+                    MediaQuery.of(context).size,
+                    _pushStoryProvider.path,
+                    Story(
+                      _pushStoryProvider.title!,
+                      _getCurrenttUser(), // user
+                      _pushStoryProvider.dateTime!,
+                      _pushStoryProvider.link!,
+                      "", // img
+                      _pushStoryProvider.context,
+                      _pushStoryProvider.track!,
+                      _pushStoryProvider.artist!,),)
+                ])),
+            state.appStatus == AppStatus.loading
+                ? const Center(child: CircularProgressIndicator())
+                : Container(),
+          ],
+        ));
   }
 }
