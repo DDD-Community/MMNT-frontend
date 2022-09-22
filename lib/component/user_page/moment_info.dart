@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dash_mement/domain/story.dart';
 import 'package:dash_mement/userpage/user_history.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +57,7 @@ class MomentInfo extends StatelessWidget {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             image: DecorationImage(
-                image: NetworkImage(story.image_url),
+                image: CachedNetworkImageProvider(story.image_url),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                     Colors.black.withOpacity(0.4), BlendMode.darken))),
