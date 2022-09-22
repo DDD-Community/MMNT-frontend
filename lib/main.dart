@@ -1,10 +1,14 @@
 import 'package:dash_mement/providers/app_provider.dart';
 import 'package:dash_mement/providers/map_provider.dart';
 import 'package:dash_mement/providers/pushstory_provider.dart';
+import 'package:dash_mement/screens/account_manage_screen.dart';
+import 'package:dash_mement/screens/password_change_screen.dart';
 import 'package:dash_mement/screens/pin_create_screen.dart';
 import 'package:dash_mement/screens/map_screen.dart';
+import 'package:dash_mement/screens/setting_screen.dart';
 import 'package:dash_mement/screens/sign_in_screen.dart';
 import 'package:dash_mement/screens/sign_up_screen.dart';
+import 'package:dash_mement/screens/web_view_screen.dart';
 import 'package:dash_mement/showstory/show_story_arguments.dart';
 import 'package:dash_mement/showstory/show_story_test.dart';
 import 'package:dash_mement/userpage/user_history.dart';
@@ -128,6 +132,10 @@ class MmntApp extends StatelessWidget {
               ShowStoryTest.routeName: (context) => ShowStoryTest(),
               UserHistory.routeName: (context) => UserHistory(),
               PinCreateScreen.routeName: (context) => PinCreateScreen(),
+              SettingScreen.routeName: (context) => const SettingScreen(),
+              AccountManageScreen.routeName: (context) =>const AccountManageScreen(),
+              PasswordChangeScreen.routeName: (context) =>const PasswordChangeScreen(),
+              WebViewScreen.routeName: (context) => const WebViewScreen(),
             },
           ),
         );
