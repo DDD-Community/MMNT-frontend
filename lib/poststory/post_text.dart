@@ -254,7 +254,7 @@ class _PostText extends State<PostText> with TickerProviderStateMixin {
                                 child:
                                     Stack(alignment: Alignment.center, children: [
                                   Positioned(
-                                      child: Text("음악추가하기",
+                                      child: Text("음악 추가하기",
                                           textAlign: TextAlign.start,
                                           style: TextStyle(
                                               fontSize: 18,

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -7,7 +8,19 @@ class UserInfo extends StatelessWidget {
   Widget _userImage(String url) {
     return ClipRRect(
         borderRadius: BorderRadius.circular(400),
-        child: Image.network(url, width: 105, height: 105, fit: BoxFit.cover));
+        child: SizedBox(
+          height: 105,
+          width: 105,
+          child: CachedNetworkImage(
+            imageUrl: url,
+            placeholder: (context, url) => const SizedBox(
+                height: 105,
+                width: 105,
+                child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          ),
+        ));
+    // child: Image.network(url, width: 105, height: 105, fit: BoxFit.cover));
   }
 
   Widget _currentUser(String user) {
