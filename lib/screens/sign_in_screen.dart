@@ -3,6 +3,7 @@ import 'package:dash_mement/screens/map_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -20,8 +21,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final emailController = TextEditingController(text: kDebugMode ? 'praconfi@naver.com' : '');
+  final passwordController = TextEditingController(text: kDebugMode ? 'asdf1234!!!' : '');
 
   @override
   void dispose() {

@@ -4,6 +4,7 @@ import 'package:dash_mement/providers/pushstory_provider.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:dash_mement/style/story_textstyle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -67,6 +68,11 @@ class PostImage extends StatelessWidget {
           title: Text("모먼트 추가하기", style: StoryTextStyle().appBarWhite),
           actions: [
             IconButton(
+              icon: const Icon(
+                  Icons.help_outline_outlined),
+              onPressed: () => showContentGuideline(context),
+            ),
+            IconButton(
               icon: Icon(Icons.close_outlined),
               onPressed: () => _popWidget(context),
             ),
@@ -104,4 +110,24 @@ class PostImage extends StatelessWidget {
               ))
         ]));
   }
+}
+
+void showContentGuideline(context) async {
+
+  final String contentGuideline = await rootBundle.loadString('assets/help/content_guideline.txt');
+
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('콘텐츠 가이드라인'),
+      content: SingleChildScrollView(child: Text(contentGuideline)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('닫기'),
+        ),
+      ],
+    ),
+  );
+
 }
