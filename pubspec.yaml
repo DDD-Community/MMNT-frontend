@@ -60,6 +60,7 @@ flutter:
     - assets/lottie/
     - assets/gif/
     - assets/marker/
+    - assets/help/
     - .env
 
   fonts:
