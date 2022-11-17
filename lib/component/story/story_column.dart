@@ -6,6 +6,9 @@ import 'package:dash_mement/component/story/username_widget.dart';
 import 'package:dash_mement/style/mmnt_style.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../screens/map_screen.dart';
 
 class StoryColumn extends StatelessWidget {
   late Story _story;
@@ -28,7 +31,8 @@ class StoryColumn extends StatelessWidget {
         Row(
           children: [
             const Spacer(),
-            TextButton(onPressed: () => showReportDialog(context), child: Text("삭제요청", style: TextStyle(fontSize: 13, color: Colors.orange.withOpacity(0.8)),))
+            TextButton(onPressed: () => showReportDialog(context), child: Text("신고하기", style: TextStyle(fontSize: 13, color: Colors.orange.withOpacity(0.8)),)),
+            TextButton(onPressed: () => showBlockDialog(context, _story.user), child: Text("차단하기", style: TextStyle(fontSize: 13, color: Colors.orange.withOpacity(0.8)),))
           ],
         ),
         Padding(
@@ -66,6 +70,40 @@ void showReportDialog(BuildContext context) {
                 onPressed: () {
                   Navigator.of(context).pop();
                   Fluttertoast.showToast(msg: "신고가 접수되었습니다");
+                },
+                child: Text("확인", style: TextStyle(color: MmntStyle().primary),))
+          ],
+        );
+      });
+}
+void showBlockDialog(BuildContext context, String userId) {
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("차단하기"),
+          content: Column(
+            children: [
+              Text("해당 유저의 글을 더 이상 볼 수 없습니다"),
+              SizedBox(height: 10,),
+            ],
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("취소")),
+            TextButton(
+                onPressed: () {
+                  // final prefs = await SharedPreferences.getInstance();
+                  // prefs.setStringList("block-user", ["${_story.user}", "test"]);
+                  // var blockUser = prefs.getStringList("block-user");
+                  // blockUser!.add(userId);
+                  // prefs.setString('token', response.data['result']['accessToken']);
+                  // Navigator.of(context).pop();
+                  Fluttertoast.showToast(msg: "해당 유저가 차단되었습니다.");
+                  Navigator.pushNamedAndRemoveUntil(context, MapScreen.routeName, (route) => false);
                 },
                 child: Text("확인", style: TextStyle(color: MmntStyle().primary),))
           ],
