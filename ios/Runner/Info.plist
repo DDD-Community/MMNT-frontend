@@ -33,15 +33,15 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Used to demonstrate image picker plugin</string>
+	<string>모먼트 생성시 필요한 사진을 촬영하기 위해 카메라가 사용됩니다</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location when in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open.</string>
+	<string>모먼트 생성시 필요한 위도 경도를 알기 위해 사용자 위치가 사용됩니다</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Used to capture audio for image picker plugin</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Used to demonstrate image picker plugin</string>
+	<string>모먼트 생성시 필요한 사진을 불러오기 위해 사진첩 사용됩니다</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -65,13 +65,13 @@
 </plist>
 	<dict>
 		<key>NSCameraUsageDescription</key>
-		<string>Used to demonstrate image picker plugin</string>
+		<string>모먼트 생성시 필요한 사진을 촬영하기 위해 카메라가 사용됩니다</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>Used to capture audio for image picker plugin</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>Used to demonstrate image picker plugin</string>
+		<string>모먼트 생성시 필요한 사진을 불러오기 위해 사진첩 사용됩니다</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>This app needs access to location when open.</string>
+		<string>모먼트 생성시 필요한 위도 경도를 알기 위해 사용자 위치가 사용됩니다</string>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<string>This app needs access to location when in the background.</string>
 		<key>CFBundleDevelopmentRegion</key>
@@ -97,15 +97,15 @@
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>NSCameraUsageDescription</key>
-		<string>Used to demonstrate image picker plugin</string>
+		<string>모먼트 생성시 필요한 사진을 촬영하기 위해 카메라가 사용됩니다</string>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<string>This app needs access to location when in the background.</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>This app needs access to location when open.</string>
+		<string>모먼트 생성시 필요한 위도 경도를 알기 위해 사용자 위치가 사용됩니다</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>Used to capture audio for image picker plugin</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>Used to demonstrate image picker plugin</string>
+		<string>모먼트 생성시 필요한 사진을 불러오기 위해 사진첩이 사용됩니다</string>
 		<key>UILaunchStoryboardName</key>
 		<string>LaunchScreen</string>
 		<key>UIMainStoryboardFile</key>
