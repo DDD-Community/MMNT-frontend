@@ -11,6 +11,7 @@ import 'package:dash_mement/screens/sign_up_screen.dart';
 import 'package:dash_mement/screens/web_view_screen.dart';
 import 'package:dash_mement/showstory/show_story_arguments.dart';
 import 'package:dash_mement/showstory/show_story_test.dart';
+import 'package:dash_mement/style/custom_theme.dart';
 import 'package:dash_mement/userpage/user_history.dart';
 import 'package:dash_mement/userpage/user_page.dart';
 import 'package:flutter/foundation.dart';
@@ -86,39 +87,9 @@ class MmntApp extends StatelessWidget {
           child: MaterialApp(
             title: 'dash_moment',
             debugShowCheckedModeBanner: false,
-
-            // Dark theme 기반
-            theme: ThemeData(
-                fontFamily: 'Pretendard',
-                brightness: Brightness.dark,
-                highlightColor: Colors.yellow,
-                scaffoldBackgroundColor: Colors.black,
-                appBarTheme: AppBarTheme(
-                    centerTitle: true,
-                    titleTextStyle: kGrayBold18,
-                    color: Colors.black,
-                    iconTheme: IconThemeData(
-                      color: kAppbarIconColor,
-                    )),
-                floatingActionButtonTheme: const FloatingActionButtonThemeData(
-                  backgroundColor: Color(0xFF1E5EFF),
-                ),
-                textTheme: TextTheme(
-                  // bodyText2가 기본 텍스트 스타일
-                  bodyText2:
-                      TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
-                ),
-                elevatedButtonTheme: ElevatedButtonThemeData(
-                    style: ElevatedButton.styleFrom(
-                        primary: kElevatedButtonColor)),
-                textButtonTheme: TextButtonThemeData(
-                    style: TextButton.styleFrom(
-                        primary: const Color(0xFF707077),
-                        textStyle: TextStyle(fontSize: 15.sp))),
-                inputDecorationTheme: InputDecorationTheme(
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                            color: kTextFormFieldUnderlineColor, width: 1.5)))),
+            darkTheme: customDarkTheme(),
+            theme: customDarkTheme(),
+            themeMode: ThemeMode.dark,
             initialRoute: LoginScreen.routeName,
             routes: {
               LoginScreen.routeName: (context) => const LoginScreen(),
