@@ -46,23 +46,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
-    if (kDebugMode) {
-      return const MmntApp();
-    }
-    return FutureBuilder(
-      future: Init.instance.initialize(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: Splash(),
-          );
-        } else {
-          return const MmntApp();
-        }
-      },
-    );
+    return const MmntApp();
   }
 }
 
@@ -90,7 +74,7 @@ class MmntApp extends StatelessWidget {
             darkTheme: customDarkTheme(),
             theme: customDarkTheme(),
             themeMode: ThemeMode.dark,
-            initialRoute: LoginScreen.routeName,
+            initialRoute: Splash.routeName,
             routes: {
               LoginScreen.routeName: (context) => const LoginScreen(),
               SignUpScreen.routeName: (context) => const SignUpScreen(),
@@ -107,21 +91,11 @@ class MmntApp extends StatelessWidget {
               AccountManageScreen.routeName: (context) =>const AccountManageScreen(),
               PasswordChangeScreen.routeName: (context) =>const PasswordChangeScreen(),
               WebViewScreen.routeName: (context) => const WebViewScreen(),
+              Splash.routeName: (context) => Splash(),
             },
           ),
         );
       },
     );
-  }
-}
-
-class Init {
-  Init._();
-  static final instance = Init._();
-
-  Future initialize() async {
-    // This is where you can initialize the resources needed by your app while
-    await Future.delayed(
-        kDebugMode ? const Duration(seconds: 4) : const Duration(seconds: 4));
   }
 }
