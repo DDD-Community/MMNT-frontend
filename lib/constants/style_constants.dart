@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 Color kGray = const Color(0xFF707077);
-Color kElevatedButtonColor = const Color(0xFF1E5EFF);
 Color kTextButtonColor = kGray;
 Color kTextFormFieldUnderlineColor = const Color(0xff1E5EFF);
 Color kAppbarIconColor = const Color(0xffbD9D9D9);

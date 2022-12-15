@@ -3,7 +3,7 @@ import 'package:dash_mement/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../constants/style_constants.dart';
+import '../constants/color_constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -34,16 +34,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Image.asset('assets/images/onboarding.png')),
                 Text(
                   '오늘의 모먼트',
-                  style: kWhiteBold21,
+                  style: Theme.of(context).textTheme.headline3,
                 ),
                 SizedBox(
                   height: 15.h,
                 ),
-                Text('지금 이순간의', style: kGray15),
+                Text('지금 이순간의', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: kDisabledColor)),
                 SizedBox(
                   height: 10.h,
                 ),
-                Text('음악과 풍경을 기록해보세요', style: kGray15),
+                Text('음악과 풍경을 기록해보세요', style: Theme.of(context).textTheme.bodyText2?.copyWith(color: kDisabledColor)),
               ],
             )),
             SizedBox(
@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                   child: Text(
                     '이메일 주소로 로그인',
-                    style: kWhiteBold15,
+                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                   onPressed: () {
                     HapticFeedback.mediumImpact();
@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       TextButton(
-                        child: Text('회원가입', style: kGrayBold15),
+                        child: Text('회원가입', style: Theme.of(context).textTheme.subtitle1?.copyWith(color: kDisabledColor)),
                         onPressed: () {
                           HapticFeedback.mediumImpact();
                           Navigator.pushNamed(context, SignUpScreen.routeName);
@@ -80,13 +80,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         width: 2,
                         height: 15,
-                        color: kTextButtonColor,
+                        color: kDisabledColor,
                       ),
                       TextButton(
                         onPressed: () {
                           HapticFeedback.mediumImpact();
                         },
-                        child: Text('로그인문의', style: kGrayBold15),
+                        child: Text('로그인문의', style: Theme.of(context).textTheme.subtitle1?.copyWith(color: kDisabledColor)),
                       ),
                     ],
                   ),
